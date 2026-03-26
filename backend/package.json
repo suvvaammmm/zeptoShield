@@ -1,7 +1,7 @@
 {
   "name": "zeptoshield-backend",
-  "version": "3.0.0",
-  "description": "ZeptoShield API — parametric insurance with ML, Razorpay, MongoDB, cron",
+  "version": "2.0.0",
+  "description": "ZeptoShield API — real OTP, WebSocket live updates, MongoDB persistence",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -12,7 +12,9 @@
     "express":   "^4.18.2",
     "mongoose":  "^8.0.0",
     "node-cron": "^3.0.3",
-    "razorpay":  "^2.9.2"
+    "razorpay":  "^2.9.2",
+    "twilio":    "^5.3.0",
+    "ws":        "^8.16.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
