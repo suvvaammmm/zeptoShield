@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — ZeptoShield</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .admin-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 88px 40px 60px;
+    }
+
+    .admin-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .admin-title {
+      font-family: var(--serif);
+      font-size: 2rem;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+    .admin-subtitle { font-size: 0.875rem; color: var(--ink-soft); margin-top: 4px; }
+    .admin-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--accent);
+      background: var(--accent-dim); padding: 4px 10px; border-radius: 99px;
+    }
+    .admin-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+    /* KPI grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .kpi-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 20px 16px;
+      transition: box-shadow 0.15s;
+    }
+    .kpi-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+    .kpi-card__label {
+      font-size: 0.75rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--ink-faint); margin-bottom: 8px;
+    }
+    .kpi-card__val {
+      font-size: 2rem; font-weight: 600;
+      color: var(--ink); line-height: 1;
+    }
+    .kpi-card__val--green { color: var(--success); }
+    .kpi-card__val--warn  { color: var(--warn); }
+    .kpi-card__val--accent{ color: var(--accent); }
+    .kpi-card__sub { font-size: 0.75rem; color: var(--ink-faint); margin-top: 6px; }
+
+    /* Section */
+    .section { margin-bottom: 32px; }
+    .section__head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .section__title {
+      font-size: 0.875rem; font-weight: 600;
+      color: var(--ink); text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .section__count {
+      font-size: 0.75rem; color: var(--ink-faint);
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 2px 10px; border-radius: 99px;
+    }
+
+    /* Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      font-size: 0.835rem;
+    }
+    .data-table thead th {
+      background: var(--surface);
+      font-size: 0.72rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--ink-faint);
+      padding: 10px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table tbody tr:hover { background: var(--surface); }
+    .data-table td {
+      padding: 11px 16px;
+      color: var(--ink);
+      vertical-align: middle;
+    }
+    .data-table td.muted { color: var(--ink-soft); }
+
+    /* Badges */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.7rem; font-weight: 600;
+      padding: 3px 8px; border-radius: 99px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .badge--approved  { background: #f0fdf4; color: var(--success); }
+    .badge--flagged   { background: #fef2f2; color: #B91C1C; }
+    .badge--pending   { background: #fffbeb; color: var(--warn); }
+    .badge--high      { background: #fef2f2; color: #B91C1C; }
+    .badge--medium    { background: #fffbeb; color: var(--warn); }
+    .badge--low       { background: #f0fdf4; color: var(--success); }
+    .badge--active    { background: var(--accent-dim); color: var(--accent); }
+    .badge--auto      { background: #eff6ff; color: #1d4ed8; }
+
+    /* Cron panel */
+    .cron-panel {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .cron-info { flex: 1; min-width: 200px; }
+    .cron-title {
+      font-size: 0.875rem; font-weight: 600; color: var(--ink);
+      display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+    }
+    .cron-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--success); animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .cron-meta { font-size: 0.8rem; color: var(--ink-soft); }
+    .cron-stats {
+      display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .cron-stat { text-align: center; }
+    .cron-stat__val { font-size: 1.5rem; font-weight: 600; color: var(--ink); }
+    .cron-stat__label { font-size: 0.72rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.04em; }
+
+    /* Empty state */
+    .empty-row td {
+      text-align: center;
+      padding: 40px !important;
+      color: var(--ink-faint);
+      font-size: 0.875rem;
+    }
+
+    .shimmer-row td { background: linear-gradient(90deg, #f0efed 25%, #e8e6e3 50%, #f0efed 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; height: 20px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+    .tab {
+      background: none; border: 1px solid var(--border);
+      font-family: var(--sans); font-size: 0.8rem; font-weight: 500;
+      color: var(--ink-soft); padding: 7px 16px;
+      border-radius: var(--radius-sm); cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab--active { background: var(--ink); color: var(--white); border-color: var(--ink); }
+    .tab:hover:not(.tab--active) { color: var(--ink); background: var(--surface); }
+
+    @media (max-width: 700px) {
+      .admin-wrap { padding: 80px 16px 40px; }
+      .data-table { font-size: 0.78rem; }
+      .data-table thead { display: none; }
+      .data-table td { display: block; padding: 6px 12px; }
+      .data-table td::before { content: attr(data-label); font-weight: 600; color: var(--ink-faint); margin-right: 8px; font-size: 0.7rem; text-transform: uppercase; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav__inner">
+    <a class="nav__logo" href="../index.html">Zepto<span>Shield</span></a>
+    <div class="nav__links">
+      <button class="nav__link" onclick="location.href='how.html'">How it works</button>
+      <button class="nav__link" onclick="location.href='lookup.html'">My policy</button>
+      <button class="nav__cta nav__link--active" style="background:var(--accent);">Admin</button>
+    </div>
+  </div>
+</nav>
+
+<main class="page fade-in">
+  <div class="admin-wrap">
+
+    <!-- Header -->
+    <div class="admin-header">
+      <div>
+        <div style="margin-bottom:8px;"><span class="admin-badge">⚙️ Platform Admin</span></div>
+        <h1 class="admin-title">Operations Dashboard</h1>
+        <p class="admin-subtitle">Real-time overview · <span id="last-updated">Loading…</span></p>
+      </div>
+      <div class="admin-actions">
+        <button class="btn btn--ghost" onclick="loadAll()" id="refresh-btn">↻ Refresh</button>
+        <button class="btn btn--primary" onclick="runCron()" id="cron-btn">▶ Run cron now</button>
+      </div>
+    </div>
+
+    <!-- KPI Strip -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-card__label">Workers registered</div>
+        <div class="kpi-card__val" id="kpi-workers">—</div>
+        <div class="kpi-card__sub">Total across all cities</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">Active policies</div>
+        <div class="kpi-card__val kpi-card__val--accent" id="kpi-policies">—</div>
+        <div class="kpi-card__sub">Currently protected</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">Claims today</div>
+        <div class="kpi-card__val" id="kpi-today">—</div>
+        <div class="kpi-card__sub">Auto + manual triggers</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">Flagged claims</div>
+        <div class="kpi-card__val kpi-card__val--warn" id="kpi-flagged">—</div>
+        <div class="kpi-card__sub">Requires manual review</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">Total payout</div>
+        <div class="kpi-card__val kpi-card__val--green" id="kpi-payout">—</div>
+        <div class="kpi-card__sub">Approved disbursements</div>
+      </div>
+    </div>
+
+    <!-- Cron Status Panel -->
+    <div class="cron-panel">
+      <div class="cron-info">
+        <div class="cron-title">
+          <div class="cron-dot" id="cron-dot"></div>
+          Auto-Claim Cron Job
+        </div>
+        <div class="cron-meta" id="cron-meta">Schedule: every 30 minutes · Fetches live weather for all active policy cities</div>
+        <div style="margin-top:8px; font-size:0.78rem; color:var(--ink-faint);">
+          Last run: <span id="cron-last">—</span> &nbsp;·&nbsp; Next run: <span id="cron-next">—</span>
+        </div>
+      </div>
+      <div class="cron-stats">
+        <div class="cron-stat">
+          <div class="cron-stat__val" id="cron-checked">—</div>
+          <div class="cron-stat__label">Cities checked</div>
+        </div>
+        <div class="cron-stat">
+          <div class="cron-stat__val" id="cron-triggered" style="color:var(--success);">—</div>
+          <div class="cron-stat__label">Claims fired</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Claims Table -->
+    <div class="section">
+      <div class="section__head">
+        <div class="section__title">Recent claims</div>
+        <span class="section__count" id="claims-count">—</span>
+      </div>
+      <div class="tabs">
+        <button class="tab tab--active" onclick="filterClaims('all', this)">All</button>
+        <button class="tab" onclick="filterClaims('approved', this)">Approved</button>
+        <button class="tab" onclick="filterClaims('flagged', this)">⚠ Flagged</button>
+        <button class="tab" onclick="filterClaims('auto', this)">🤖 Auto-triggered</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Worker</th>
+              <th>City</th>
+              <th>Event</th>
+              <th>Value</th>
+              <th>Payout</th>
+              <th>Status</th>
+              <th>Source</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="claims-tbody">
+            <tr class="shimmer-row"><td colspan="8"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Workers Table -->
+    <div class="section">
+      <div class="section__head">
+        <div class="section__title">Registered workers</div>
+        <span class="section__count" id="workers-count">—</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>City</th>
+              <th>Risk tier</th>
+              <th>Premium</th>
+              <th>Weekly earnings</th>
+              <th>Registered</th>
+            </tr>
+          </thead>
+          <tbody id="workers-tbody">
+            <tr class="shimmer-row"><td colspan="7"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__logo">Zepto<span>Shield</span></div>
+    <div class="footer__copy">© 2026 ZeptoShield · Admin Panel</div>
+  </div>
+</footer>
+
+<script src="../js/api.js"></script>
+<script>
+const API = window.API_BASE || "http://localhost:5000";
+
+let allClaims   = [];
+let allWorkers  = [];
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso);
+  const m = Math.floor(diff / 60000);
+  if (m < 1)  return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"2-digit" });
+}
+
+function badgeHtml(text, type) {
+  return `<span class="badge badge--${type}">${text}</span>`;
+}
+
+function eventIcon(type) {
+  return { rain: "🌧", heat: "🔥", aqi: "💨", flood: "🌊" }[type] || "⚡";
+}
+
+// ── Load stats ────────────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const res  = await fetch(`${API}/api/stats`);
+    const data = await res.json();
+    document.getElementById("kpi-workers").textContent  = data.totalWorkers;
+    document.getElementById("kpi-policies").textContent = data.activePolicies;
+    document.getElementById("kpi-today").textContent    = data.claimsToday;
+    document.getElementById("kpi-flagged").textContent  = data.flaggedClaims;
+    document.getElementById("kpi-payout").textContent   = `₹${(data.totalPayout || 0).toLocaleString("en-IN")}`;
+  } catch (err) {
+    console.error("Stats load failed:", err.message);
+  }
+}
+
+// ── Load cron status ──────────────────────────────────────────────────────────
+async function loadCronStatus() {
+  try {
+    const res  = await fetch(`${API}/api/admin/cron-status`);
+    const data = await res.json();
+    document.getElementById("cron-last").textContent      = data.lastRun ? timeAgo(data.lastRun) : "Never";
+    document.getElementById("cron-next").textContent      = data.nextRun && data.nextRun !== "pending"
+      ? new Date(data.nextRun).toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit" })
+      : "~30 min";
+    document.getElementById("cron-checked").textContent   = data.stats?.checked   ?? "—";
+    document.getElementById("cron-triggered").textContent = data.stats?.triggered  ?? "—";
+  } catch {}
+}
+
+// ── Load claims ───────────────────────────────────────────────────────────────
+async function loadClaims() {
+  try {
+    const res = await fetch(`${API}/api/admin/claims`);
+    allClaims = await res.json();
+    document.getElementById("claims-count").textContent = `${allClaims.length} total`;
+    renderClaims(allClaims);
+  } catch (err) {
+    document.getElementById("claims-tbody").innerHTML =
+      `<tr class="empty-row"><td colspan="8">⚠ Could not load claims — is the server running?</td></tr>`;
+  }
+}
+
+function renderClaims(claims) {
+  const tbody = document.getElementById("claims-tbody");
+  if (!claims.length) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">No claims yet. Claims auto-trigger when weather thresholds are crossed.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = claims.map(c => {
+    const worker = c.workerId;
+    const name   = worker?.name  || "—";
+    const city   = worker?.city  || "—";
+    const status = c.status === "approved"
+      ? badgeHtml("✓ Approved", "approved")
+      : c.status === "flagged"
+      ? badgeHtml("⚠ Flagged", "flagged")
+      : badgeHtml("Pending", "pending");
+    const source = c.autoTriggered
+      ? badgeHtml("🤖 Auto", "auto")
+      : badgeHtml("Manual", "pending");
+    return `
+      <tr>
+        <td data-label="Worker">${name}</td>
+        <td data-label="City" class="muted">${city}</td>
+        <td data-label="Event">${eventIcon(c.eventType)} ${c.eventType || "—"}</td>
+        <td data-label="Value" class="muted">${c.eventValue ?? "—"}</td>
+        <td data-label="Payout" style="font-weight:600; color:var(--success);">
+          ${c.payout ? `₹${c.payout}` : "—"}
+        </td>
+        <td data-label="Status">${status}</td>
+        <td data-label="Source">${source}</td>
+        <td data-label="Time" class="muted">${timeAgo(c.createdAt)}</td>
+      </tr>`;
+  }).join("");
+}
+
+function filterClaims(type, el) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("tab--active"));
+  el.classList.add("tab--active");
+  if (type === "all")      renderClaims(allClaims);
+  else if (type === "auto")renderClaims(allClaims.filter(c => c.autoTriggered));
+  else                     renderClaims(allClaims.filter(c => c.status === type));
+}
+
+// ── Load workers ──────────────────────────────────────────────────────────────
+async function loadWorkers() {
+  try {
+    const res = await fetch(`${API}/api/admin/workers`);
+    allWorkers = await res.json();
+    document.getElementById("workers-count").textContent = `${allWorkers.length} registered`;
+    const tbody = document.getElementById("workers-tbody");
+    if (!allWorkers.length) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No workers registered yet.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = allWorkers.map(w => `
+      <tr>
+        <td data-label="Name" style="font-weight:500;">${w.name}</td>
+        <td data-label="Phone" class="muted">${w.phone}</td>
+        <td data-label="City">${w.city}</td>
+        <td data-label="Risk">${badgeHtml(w.riskTier || "—", w.riskTier || "low")}</td>
+        <td data-label="Premium" style="font-weight:600;">₹${w.premium}/wk</td>
+        <td data-label="Earnings" class="muted">₹${(w.weeklyEarnings || 0).toLocaleString("en-IN")}</td>
+        <td data-label="Registered" class="muted">${fmtDate(w.registeredAt)}</td>
+      </tr>`).join("");
+  } catch (err) {
+    document.getElementById("workers-tbody").innerHTML =
+      `<tr class="empty-row"><td colspan="7">⚠ Could not load workers.</td></tr>`;
+  }
+}
+
+// ── Run cron manually ─────────────────────────────────────────────────────────
+async function runCron() {
+  const btn = document.getElementById("cron-btn");
+  btn.textContent = "Running…";
+  btn.disabled = true;
+  try {
+    const res  = await fetch(`${API}/api/admin/run-cron`, { method: "POST" });
+    const data = await res.json();
+    const r = data.result;
+    alert(`✅ Cron complete!\n\nCities checked: ${r.checked}\nClaims triggered: ${r.triggered}\n\n${
+      r.triggered > 0
+        ? r.results.filter(x => x.status === "claim_triggered").map(x =>
+            `• ${x.workerName} (${x.city}): ${x.eventType} ${x.eventValue} → ₹${x.payout}`
+          ).join("\n")
+        : "No thresholds crossed — all cities below trigger levels."
+    }`);
+    await loadAll();
+  } catch (err) {
+    alert("⚠ Cron failed — is the server running?\n" + err.message);
+  } finally {
+    btn.textContent = "▶ Run cron now";
+    btn.disabled = false;
+  }
+}
+
+// ── Load all ──────────────────────────────────────────────────────────────────
+async function loadAll() {
+  document.getElementById("last-updated").textContent =
+    "Updated " + new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+  await Promise.all([loadStats(), loadCronStatus(), loadClaims(), loadWorkers()]);
+}
+
+// Auto-refresh every 60 seconds
+loadAll();
+setInterval(loadAll, 60_000);
+</script>
+</body>
+</html>
