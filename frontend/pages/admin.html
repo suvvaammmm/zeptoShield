@@ -6,387 +6,185 @@
   <title>Admin — ZeptoShield</title>
   <link rel="stylesheet" href="../css/style.css" />
   <style>
-    .admin-wrap {
-      max-width: 1160px;
-      margin: 0 auto;
-      padding: 88px 40px 80px;
-    }
+    .admin-wrap { max-width: 1160px; margin: 0 auto; padding: 88px 40px 80px; }
 
-    /* ── Header ── */
     .admin-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 32px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start;
+      justify-content: space-between; flex-wrap: wrap;
+      gap: 16px; margin-bottom: 32px;
+      padding-bottom: 24px; border-bottom: 1px solid var(--border);
     }
-    .admin-title {
-      font-family: var(--serif);
-      font-size: 2rem;
-      color: var(--ink);
-      letter-spacing: -0.02em;
-    }
+    .admin-title { font-family: var(--serif); font-size: 2rem; color: var(--ink); letter-spacing: -0.02em; }
     .admin-subtitle { font-size: 0.875rem; color: var(--ink-soft); margin-top: 4px; }
     .admin-badge {
       display: inline-flex; align-items: center; gap: 6px;
       font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
       text-transform: uppercase; color: var(--accent);
-      background: var(--accent-dim); padding: 4px 10px; border-radius: 99px;
-      margin-bottom: 8px;
+      background: var(--accent-dim); padding: 4px 10px; border-radius: 99px; margin-bottom: 8px;
     }
     .admin-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
-    /* ── KPI grid ── */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-      gap: 14px;
-      margin-bottom: 28px;
+    /* Live status bar */
+    .live-bar {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 10px 16px;
+      margin-bottom: 24px; font-size: 0.8rem;
     }
+    .live-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--ink-faint); flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    .live-dot.online { background: var(--success); box-shadow: 0 0 0 0 rgba(26,122,74,0.4); animation: pulse-dot 2s infinite; }
+    @keyframes pulse-dot {
+      0%  { box-shadow: 0 0 0 0 rgba(26,122,74,0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(26,122,74,0); }
+      100%{ box-shadow: 0 0 0 0 rgba(26,122,74,0); }
+    }
+    .live-label { color: var(--ink-soft); }
+    .live-activity { flex: 1; color: var(--ink-faint); font-style: italic; }
+    .live-activity.flash { color: var(--success); font-style: normal; font-weight: 500; animation: flash-in 0.3s ease; }
+    @keyframes flash-in { from { opacity:0; } to { opacity:1; } }
+
+    /* KPI grid */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 14px; margin-bottom: 24px; }
     .kpi-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 20px 16px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 20px 16px;
       transition: box-shadow 0.15s, transform 0.15s;
-      position: relative;
-      overflow: hidden;
+      position: relative; overflow: hidden;
     }
-    .kpi-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: var(--border);
-      transition: background 0.2s;
-    }
+    .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--border); }
     .kpi-card--accent::before { background: var(--accent); }
     .kpi-card--green::before  { background: var(--success); }
     .kpi-card--warn::before   { background: var(--warn); }
     .kpi-card--blue::before   { background: #3b82f6; }
     .kpi-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); transform: translateY(-1px); }
-    .kpi-card__label {
-      font-size: 0.72rem; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--ink-faint); margin-bottom: 10px;
-    }
-    .kpi-card__val {
-      font-size: 2.2rem; font-weight: 700;
-      color: var(--ink); line-height: 1;
-      font-variant-numeric: tabular-nums;
-    }
+    .kpi-card__label { font-size: 0.71rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); margin-bottom: 10px; }
+    .kpi-card__val { font-size: 2.2rem; font-weight: 700; color: var(--ink); line-height: 1; font-variant-numeric: tabular-nums; transition: all 0.3s; }
     .kpi-card__val--green  { color: var(--success); }
     .kpi-card__val--warn   { color: var(--warn); }
     .kpi-card__val--accent { color: var(--accent); }
     .kpi-card__val--blue   { color: #3b82f6; }
-    .kpi-card__sub { font-size: 0.73rem; color: var(--ink-faint); margin-top: 8px; }
-    .kpi-card__delta {
-      display: inline-flex; align-items: center; gap: 3px;
-      font-size: 0.7rem; font-weight: 600;
-      padding: 2px 7px; border-radius: 99px;
-      margin-top: 6px;
-    }
-    .kpi-card__delta--up   { background: #f0fdf4; color: var(--success); }
-    .kpi-card__delta--warn { background: #fffbeb; color: var(--warn); }
+    .kpi-card__sub { font-size: 0.72rem; color: var(--ink-faint); margin-top: 8px; }
+    .kpi-card__val.bumped { animation: bump 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes bump { 0%,100%{transform:scale(1);} 50%{transform:scale(1.12);} }
 
-    /* ── Cron panel ── */
-    .cron-panel {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      margin-bottom: 28px;
-      position: relative;
-      overflow: hidden;
-    }
-    .cron-panel::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; bottom: 0;
-      width: 4px;
-      background: linear-gradient(180deg, var(--success) 0%, #34d399 100%);
-      border-radius: 4px 0 0 4px;
-    }
-    .cron-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-    .cron-info { flex: 1; min-width: 200px; }
-    .cron-title {
-      font-size: 0.875rem; font-weight: 600; color: var(--ink);
-      display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
-    }
-    .cron-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--success);
-      box-shadow: 0 0 0 0 rgba(26,122,74,0.4);
-      animation: pulse-dot 2s infinite;
-    }
-    @keyframes pulse-dot {
-      0%   { box-shadow: 0 0 0 0 rgba(26,122,74,0.4); }
-      70%  { box-shadow: 0 0 0 8px rgba(26,122,74,0); }
-      100% { box-shadow: 0 0 0 0 rgba(26,122,74,0); }
-    }
-    .cron-meta { font-size: 0.8rem; color: var(--ink-soft); }
-    .cron-timing { font-size: 0.78rem; color: var(--ink-faint); margin-top: 6px; }
-    .cron-stats {
-      display: flex; gap: 28px; flex-wrap: wrap;
-    }
-    .cron-stat { text-align: center; }
-    .cron-stat__val {
-      font-size: 1.75rem; font-weight: 700;
-      color: var(--ink); line-height: 1;
-      font-variant-numeric: tabular-nums;
-    }
-    .cron-stat__label {
-      font-size: 0.7rem; color: var(--ink-faint);
-      text-transform: uppercase; letter-spacing: 0.05em;
-      margin-top: 3px;
-    }
-
-    /* Cron results log */
-    .cron-log {
-      margin-top: 16px;
-      border-top: 1px solid var(--border);
-      padding-top: 14px;
-      display: none;
-    }
-    .cron-log.visible { display: block; }
-    .cron-log__title {
-      font-size: 0.75rem; font-weight: 600; color: var(--ink-faint);
-      text-transform: uppercase; letter-spacing: 0.06em;
-      margin-bottom: 10px;
-    }
-    .cron-log__items {
-      display: flex; flex-direction: column; gap: 6px;
-      max-height: 220px; overflow-y: auto;
-    }
-    .cron-log__item {
-      display: flex; align-items: center; justify-content: space-between;
-      font-size: 0.8rem; padding: 8px 12px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: var(--surface);
-    }
-    .cron-log__item.triggered {
-      background: #f0fdf4; border-color: #bbf7d0;
-    }
-    .cron-log__item.below {
-      color: var(--ink-faint);
-    }
-    .cron-log__city { font-weight: 600; color: var(--ink); }
-    .cron-log__event { color: var(--ink-soft); }
-    .cron-log__payout { font-weight: 600; color: var(--success); }
-
-    /* ── Section ── */
-    .section { margin-bottom: 32px; }
-    .section__head {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 14px; gap: 12px;
-    }
-    .section__left { display: flex; align-items: center; gap: 12px; }
-    .section__title {
-      font-size: 0.875rem; font-weight: 600;
-      color: var(--ink); text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .section__count {
-      font-size: 0.72rem; color: var(--ink-faint);
-      background: var(--surface); border: 1px solid var(--border);
-      padding: 2px 10px; border-radius: 99px;
-    }
-
-    /* ── Tabs ── */
-    .tabs { display: flex; gap: 4px; margin-bottom: 14px; flex-wrap: wrap; }
-    .tab {
-      background: none; border: 1px solid var(--border);
-      font-family: var(--sans); font-size: 0.8rem; font-weight: 500;
-      color: var(--ink-soft); padding: 6px 16px;
-      border-radius: var(--radius-sm); cursor: pointer;
-      transition: all 0.15s;
-    }
-    .tab--active { background: var(--ink); color: var(--white); border-color: var(--ink); }
-    .tab:hover:not(.tab--active) { color: var(--ink); background: var(--surface); }
-
-    /* ── Table ── */
-    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--white);
-      font-size: 0.835rem;
-    }
-    .data-table thead th {
-      background: var(--surface);
-      font-size: 0.7rem; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.07em;
-      color: var(--ink-faint);
-      padding: 10px 16px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-    .data-table tbody tr {
-      border-bottom: 1px solid var(--border);
-      transition: background 0.1s;
-    }
-    .data-table tbody tr:last-child { border-bottom: none; }
-    .data-table tbody tr:hover { background: var(--surface); }
-    .data-table td {
-      padding: 12px 16px;
-      color: var(--ink);
-      vertical-align: middle;
-    }
-    .data-table td.muted { color: var(--ink-soft); font-size: 0.8rem; }
-    .data-table .no-wrap { white-space: nowrap; }
-
-    /* ── Badges ── */
-    .badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      font-size: 0.68rem; font-weight: 600;
-      padding: 3px 9px; border-radius: 99px;
-      text-transform: uppercase; letter-spacing: 0.04em;
-      white-space: nowrap;
-    }
-    .badge--approved  { background: #f0fdf4; color: var(--success); }
-    .badge--flagged   { background: #fef2f2; color: #b91c1c; }
-    .badge--pending   { background: #fffbeb; color: var(--warn); }
-    .badge--high      { background: #fef2f2; color: #b91c1c; }
-    .badge--medium    { background: #fffbeb; color: var(--warn); }
-    .badge--low       { background: #f0fdf4; color: var(--success); }
-    .badge--active    { background: var(--accent-dim); color: var(--accent); }
-    .badge--auto      { background: #eff6ff; color: #1d4ed8; }
-
-    /* ── Empty / loading ── */
-    .empty-row td {
-      text-align: center;
-      padding: 48px !important;
-      color: var(--ink-faint);
-      font-size: 0.875rem;
-    }
-    .shimmer-row td {
-      background: linear-gradient(90deg, #f0efed 25%, #e8e6e3 50%, #f0efed 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-      height: 22px; border-radius: 4px;
-    }
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-    /* ── Two-col layout for policies ── */
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    /* ── City breakdown ── */
-    .city-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px;
-    }
-    .city-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 14px 16px;
-      transition: box-shadow 0.15s;
-    }
-    .city-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.06); }
-    .city-card__name { font-size: 0.875rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
-    .city-card__meta { font-size: 0.78rem; color: var(--ink-faint); display: flex; flex-direction: column; gap: 2px; }
-    .city-card__meta span { display: flex; justify-content: space-between; }
-    .city-card__meta .val { color: var(--ink-soft); font-weight: 500; }
-
-    /* ── Flagged review panel ── */
+    /* Flagged banner */
     .flagged-banner {
-      display: none;
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      border-radius: var(--radius);
-      padding: 14px 20px;
-      margin-bottom: 20px;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      display: none; background: #fef2f2; border: 1px solid #fecaca;
+      border-radius: var(--radius); padding: 14px 20px;
+      margin-bottom: 20px; align-items: center;
+      justify-content: space-between; gap: 12px;
     }
     .flagged-banner.visible { display: flex; }
     .flagged-banner__text { font-size: 0.875rem; color: #991b1b; font-weight: 500; }
-    .flagged-banner__sub  { font-size: 0.78rem; color: #b91c1c; margin-top: 2px; }
 
-    /* ── Search box ── */
-    .search-box {
-      font-family: var(--sans);
-      font-size: 0.835rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 7px 12px;
-      background: var(--white);
-      color: var(--ink);
-      outline: none;
-      width: 200px;
-      transition: border-color 0.15s, box-shadow 0.15s;
+    /* Cron panel */
+    .cron-panel {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 24px;
+      margin-bottom: 24px; position: relative; overflow: hidden;
     }
-    .search-box:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-dim);
+    .cron-panel::before {
+      content: ''; position: absolute; top:0; left:0; bottom:0; width:4px;
+      background: linear-gradient(180deg, var(--success) 0%, #34d399 100%);
     }
-    .search-box::placeholder { color: var(--ink-faint); }
+    .cron-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .cron-info { flex: 1; min-width: 200px; }
+    .cron-title { font-size: 0.875rem; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .cron-meta { font-size: 0.8rem; color: var(--ink-soft); }
+    .cron-timing { font-size: 0.78rem; color: var(--ink-faint); margin-top: 5px; }
+    .cron-stats { display: flex; gap: 28px; flex-wrap: wrap; }
+    .cron-stat { text-align: center; }
+    .cron-stat__val { font-size: 1.75rem; font-weight: 700; color: var(--ink); line-height:1; }
+    .cron-stat__label { font-size: 0.7rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.05em; margin-top:3px; }
 
-    /* ── Toast ── */
-    .toast {
-      position: fixed; bottom: 24px; right: 24px;
-      background: var(--ink); color: var(--white);
-      font-size: 0.835rem; font-weight: 500;
-      padding: 12px 20px; border-radius: var(--radius-sm);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-      z-index: 9999;
-      transform: translateY(80px); opacity: 0;
-      transition: transform 0.25s, opacity 0.25s;
-      max-width: 340px;
-    }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .toast--success { background: var(--success); }
-    .toast--warn    { background: var(--warn); }
+    .cron-log { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 14px; display: none; }
+    .cron-log.visible { display: block; }
+    .cron-log__title { font-size: 0.73rem; font-weight: 600; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .cron-log__items { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+    .cron-log__item { display:flex; align-items:center; justify-content:space-between; font-size:0.8rem; padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--surface); }
+    .cron-log__item.triggered { background:#f0fdf4; border-color:#bbf7d0; }
+    .cron-log__item.below     { color: var(--ink-faint); }
+    .cron-log__payout { font-weight: 600; color: var(--success); }
 
-    /* ── Active policies compact ── */
-    .policy-row-name { font-weight: 500; }
-    .policy-row-coverage { color: var(--success); font-weight: 600; }
+    /* Two col */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-    /* ── Responsive ── */
-    @media (max-width: 900px) {
-      .two-col { grid-template-columns: 1fr; }
-    }
+    /* Section */
+    .section { margin-bottom: 28px; }
+    .section__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 12px; }
+    .section__left { display: flex; align-items: center; gap: 12px; }
+    .section__title { font-size: 0.875rem; font-weight: 600; color: var(--ink); text-transform: uppercase; letter-spacing: 0.05em; }
+    .section__count { font-size: 0.72rem; color: var(--ink-faint); background: var(--surface); border: 1px solid var(--border); padding: 2px 10px; border-radius: 99px; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; margin-bottom: 14px; flex-wrap: wrap; }
+    .tab { background: none; border: 1px solid var(--border); font-family: var(--sans); font-size: 0.8rem; font-weight: 500; color: var(--ink-soft); padding: 6px 16px; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
+    .tab--active { background: var(--ink); color: var(--white); border-color: var(--ink); }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    .data-table { width:100%; border-collapse:collapse; background:var(--white); font-size:0.835rem; }
+    .data-table thead th { background:var(--surface); font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--ink-faint); padding:10px 16px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; }
+    .data-table tbody tr { border-bottom:1px solid var(--border); transition:background 0.1s; }
+    .data-table tbody tr:last-child { border-bottom:none; }
+    .data-table tbody tr:hover { background:var(--surface); }
+    .data-table td { padding:12px 16px; color:var(--ink); vertical-align:middle; }
+    .data-table td.muted { color:var(--ink-soft); font-size:0.8rem; }
+    .data-table .no-wrap { white-space:nowrap; }
+
+    /* NEW ROW HIGHLIGHT */
+    .data-table tbody tr.new-row { animation: row-highlight 2s ease; }
+    @keyframes row-highlight { 0%,20%{background:#f0fdf4;} 100%{background:transparent;} }
+
+    /* Badges */
+    .badge { display:inline-flex; align-items:center; gap:4px; font-size:0.68rem; font-weight:600; padding:3px 9px; border-radius:99px; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+    .badge--approved { background:#f0fdf4; color:var(--success); }
+    .badge--flagged  { background:#fef2f2; color:#b91c1c; }
+    .badge--pending  { background:#fffbeb; color:var(--warn); }
+    .badge--high     { background:#fef2f2; color:#b91c1c; }
+    .badge--medium   { background:#fffbeb; color:var(--warn); }
+    .badge--low      { background:#f0fdf4; color:var(--success); }
+    .badge--auto     { background:#eff6ff; color:#1d4ed8; }
+
+    /* Empty / shimmer */
+    .empty-row td { text-align:center; padding:48px !important; color:var(--ink-faint); font-size:0.875rem; }
+    .shimmer-row td { background:linear-gradient(90deg,#f0efed 25%,#e8e6e3 50%,#f0efed 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; height:22px; border-radius:4px; }
+    @keyframes shimmer { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+
+    /* City grid */
+    .city-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:12px; }
+    .city-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; transition:box-shadow 0.15s; }
+    .city-card:hover { box-shadow:0 3px 12px rgba(0,0,0,0.06); }
+    .city-card__name { font-size:0.875rem; font-weight:600; color:var(--ink); margin-bottom:6px; }
+    .city-card__meta { font-size:0.78rem; color:var(--ink-faint); display:flex; flex-direction:column; gap:2px; }
+    .city-card__meta span { display:flex; justify-content:space-between; }
+    .city-card__meta .val { color:var(--ink-soft); font-weight:500; }
+
+    /* Search */
+    .search-box { font-family:var(--sans); font-size:0.835rem; border:1px solid var(--border); border-radius:var(--radius-sm); padding:7px 12px; background:var(--white); color:var(--ink); outline:none; width:200px; transition:border-color 0.15s, box-shadow 0.15s; }
+    .search-box:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-dim); }
+    .search-box::placeholder { color:var(--ink-faint); }
+
+    /* Logout btn */
+    .logout-btn { background:none; border:1px solid var(--border); font-family:var(--sans); font-size:0.8rem; color:var(--ink-soft); padding:7px 14px; border-radius:var(--radius-sm); cursor:pointer; transition:all 0.15s; }
+    .logout-btn:hover { background:var(--surface); color:var(--ink); }
+
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
     @media (max-width: 700px) {
       .admin-wrap { padding: 80px 16px 40px; }
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-      .data-table { font-size: 0.78rem; }
       .data-table thead { display: none; }
-      .data-table td {
-        display: block; padding: 6px 12px;
-      }
-      .data-table td::before {
-        content: attr(data-label);
-        font-weight: 600; color: var(--ink-faint);
-        margin-right: 8px; font-size: 0.68rem;
-        text-transform: uppercase;
-      }
-      .cron-stats { gap: 16px; }
-      .city-grid { grid-template-columns: repeat(2, 1fr); }
+      .data-table td { display:block; padding:6px 12px; }
+      .data-table td::before { content:attr(data-label); font-weight:600; color:var(--ink-faint); margin-right:8px; font-size:0.68rem; text-transform:uppercase; }
       .search-box { width: 100%; }
     }
   </style>
 </head>
 <body>
-
-<!-- Toast -->
-<div class="toast" id="toast"></div>
 
 <nav class="nav">
   <div class="nav__inner">
@@ -394,7 +192,8 @@
     <div class="nav__links">
       <button class="nav__link" onclick="location.href='how.html'">How it works</button>
       <button class="nav__link" onclick="location.href='lookup.html'">My policy</button>
-      <button class="nav__cta" style="background:var(--accent);">Admin</button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+      <button class="nav__cta" style="background:var(--accent); margin-left:4px;">Admin</button>
     </div>
   </div>
 </nav>
@@ -407,24 +206,29 @@
       <div>
         <div><span class="admin-badge">⚙️ Platform Admin</span></div>
         <h1 class="admin-title">Operations Dashboard</h1>
-        <p class="admin-subtitle">Real-time overview · <span id="last-updated">Loading…</span></p>
+        <p class="admin-subtitle">Real-time · <span id="last-updated">Loading…</span></p>
       </div>
       <div class="admin-actions">
-        <button class="btn btn--ghost" onclick="loadAll()" id="refresh-btn">↻ Refresh</button>
-        <button class="btn btn--primary" onclick="runCron()" id="cron-btn">▶ Run cron now</button>
+        <button class="btn btn--ghost" onclick="loadAll()" id="btn-refresh">↻ Refresh</button>
+        <button class="btn btn--primary" onclick="runCron()" id="btn-cron">▶ Run cron now</button>
       </div>
+    </div>
+
+    <!-- Live WebSocket status bar -->
+    <div class="live-bar">
+      <div class="live-dot" id="live-dot"></div>
+      <span class="live-label">Live feed</span>
+      <span class="live-activity" id="live-activity">Connecting to real-time updates…</span>
     </div>
 
     <!-- Flagged alert banner -->
     <div class="flagged-banner" id="flagged-banner">
       <div>
         <div class="flagged-banner__text">⚠️ <span id="flagged-count">0</span> claims require manual review</div>
-        <div class="flagged-banner__sub">Fraud detection has flagged these claims — review before approving payout.</div>
+        <div style="font-size:0.78rem;color:#b91c1c;margin-top:2px;">Fraud detection flagged these — review before approving payout.</div>
       </div>
-      <button class="btn btn--ghost" style="border-color:#fecaca; color:#b91c1c; font-size:0.8rem;"
-        onclick="filterClaims('flagged', document.querySelector('[data-tab=flagged]'))">
-        View flagged →
-      </button>
+      <button class="btn btn--ghost" style="border-color:#fecaca;color:#b91c1c;font-size:0.8rem;"
+        onclick="filterClaims('flagged', document.querySelector('[data-tab=flagged]'))">View flagged →</button>
     </div>
 
     <!-- KPI Strip -->
@@ -442,12 +246,12 @@
       <div class="kpi-card">
         <div class="kpi-card__label">Claims today</div>
         <div class="kpi-card__val" id="kpi-today">—</div>
-        <div class="kpi-card__sub">Auto + manual triggers</div>
+        <div class="kpi-card__sub">Auto + manual</div>
       </div>
       <div class="kpi-card kpi-card--warn">
         <div class="kpi-card__label">Flagged claims</div>
         <div class="kpi-card__val kpi-card__val--warn" id="kpi-flagged">—</div>
-        <div class="kpi-card__sub">Requires manual review</div>
+        <div class="kpi-card__sub">Manual review needed</div>
       </div>
       <div class="kpi-card kpi-card--green">
         <div class="kpi-card__label">Total payout</div>
@@ -457,49 +261,36 @@
       <div class="kpi-card">
         <div class="kpi-card__label">Approval rate</div>
         <div class="kpi-card__val" id="kpi-rate">—</div>
-        <div class="kpi-card__sub">Claims approved vs total</div>
+        <div class="kpi-card__sub">Claims approved</div>
       </div>
     </div>
 
-    <!-- Cron Status Panel -->
+    <!-- Cron Panel -->
     <div class="cron-panel">
       <div class="cron-inner">
         <div class="cron-info">
           <div class="cron-title">
-            <div class="cron-dot" id="cron-dot"></div>
+            <div class="live-dot online" id="cron-dot"></div>
             Auto-Claim Cron Job
-            <span class="badge badge--active" style="font-size:0.65rem;">Active</span>
           </div>
-          <div class="cron-meta">Every 30 min · Fetches live weather via Open-Meteo · Auto-fires if threshold crossed</div>
+          <div class="cron-meta">Every 30 min · Open-Meteo live weather · Auto-fires when thresholds crossed</div>
           <div class="cron-timing">
-            Last run: <strong id="cron-last">—</strong>
-            &nbsp;·&nbsp;
-            Next run: <strong id="cron-next">—</strong>
+            Last run: <strong id="cron-last">—</strong> &nbsp;·&nbsp; Next: <strong id="cron-next">—</strong>
           </div>
         </div>
         <div class="cron-stats">
-          <div class="cron-stat">
-            <div class="cron-stat__val" id="cron-checked">—</div>
-            <div class="cron-stat__label">Cities checked</div>
-          </div>
-          <div class="cron-stat">
-            <div class="cron-stat__val" id="cron-triggered" style="color:var(--success);">—</div>
-            <div class="cron-stat__label">Claims fired</div>
-          </div>
+          <div class="cron-stat"><div class="cron-stat__val" id="cron-checked">—</div><div class="cron-stat__label">Cities</div></div>
+          <div class="cron-stat"><div class="cron-stat__val" id="cron-triggered" style="color:var(--success);">—</div><div class="cron-stat__label">Claims fired</div></div>
         </div>
       </div>
-
-      <!-- Inline cron results log -->
       <div class="cron-log" id="cron-log">
         <div class="cron-log__title">Last cron results</div>
         <div class="cron-log__items" id="cron-log-items"></div>
       </div>
     </div>
 
-    <!-- Claims + Active Policies -->
+    <!-- Claims + Policies -->
     <div class="two-col">
-
-      <!-- Claims Table -->
       <div class="section" style="margin-bottom:0;">
         <div class="section__head">
           <div class="section__left">
@@ -508,31 +299,19 @@
           </div>
         </div>
         <div class="tabs">
-          <button class="tab tab--active" data-tab="all"     onclick="filterClaims('all', this)">All</button>
-          <button class="tab" data-tab="approved"            onclick="filterClaims('approved', this)">✓ Approved</button>
-          <button class="tab" data-tab="flagged"             onclick="filterClaims('flagged', this)">⚠ Flagged</button>
-          <button class="tab" data-tab="auto"                onclick="filterClaims('auto', this)">🤖 Auto</button>
+          <button class="tab tab--active" data-tab="all"      onclick="filterClaims('all', this)">All</button>
+          <button class="tab" data-tab="approved"             onclick="filterClaims('approved', this)">✓ Approved</button>
+          <button class="tab" data-tab="flagged"              onclick="filterClaims('flagged', this)">⚠ Flagged</button>
+          <button class="tab" data-tab="auto"                 onclick="filterClaims('auto', this)">🤖 Auto</button>
         </div>
         <div class="table-wrap">
           <table class="data-table">
-            <thead>
-              <tr>
-                <th>Worker</th>
-                <th>Event</th>
-                <th>Payout</th>
-                <th>Status</th>
-                <th>Source</th>
-                <th>Time</th>
-              </tr>
-            </thead>
-            <tbody id="claims-tbody">
-              <tr class="shimmer-row"><td colspan="6"></td></tr>
-            </tbody>
+            <thead><tr><th>Worker</th><th>Event</th><th>Payout</th><th>Status</th><th>Source</th><th>Time</th></tr></thead>
+            <tbody id="claims-tbody"><tr class="shimmer-row"><td colspan="6"></td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- Active Policies Table -->
       <div class="section" style="margin-bottom:0;">
         <div class="section__head">
           <div class="section__left">
@@ -541,30 +320,19 @@
           </div>
         </div>
         <div style="margin-bottom:14px;">
-          <input class="search-box" id="policy-search" placeholder="Search worker or city…" oninput="filterPolicies(this.value)" />
+          <input class="search-box" placeholder="Search worker or city…" oninput="filterPolicies(this.value)" />
         </div>
         <div class="table-wrap">
           <table class="data-table">
-            <thead>
-              <tr>
-                <th>Worker</th>
-                <th>City</th>
-                <th>Premium</th>
-                <th>Coverage</th>
-                <th>Since</th>
-              </tr>
-            </thead>
-            <tbody id="policies-tbody">
-              <tr class="shimmer-row"><td colspan="5"></td></tr>
-            </tbody>
+            <thead><tr><th>Worker</th><th>City</th><th>Premium</th><th>Coverage</th><th>Since</th></tr></thead>
+            <tbody id="policies-tbody"><tr class="shimmer-row"><td colspan="5"></td></tr></tbody>
           </table>
         </div>
       </div>
-
     </div>
 
     <!-- City Breakdown -->
-    <div class="section" style="margin-top:28px;">
+    <div class="section" style="margin-top:24px;">
       <div class="section__head">
         <div class="section__left">
           <div class="section__title">City breakdown</div>
@@ -572,7 +340,6 @@
         </div>
       </div>
       <div class="city-grid" id="city-grid">
-        <!-- Populated by JS -->
         <div class="city-card"><div class="city-card__name" style="color:var(--ink-faint);">Loading…</div></div>
       </div>
     </div>
@@ -584,24 +351,12 @@
           <div class="section__title">Registered workers</div>
           <span class="section__count" id="workers-count">—</span>
         </div>
-        <input class="search-box" id="worker-search" placeholder="Search name or phone…" oninput="filterWorkers(this.value)" />
+        <input class="search-box" placeholder="Search name or phone…" oninput="filterWorkers(this.value)" />
       </div>
       <div class="table-wrap">
         <table class="data-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>City</th>
-              <th>Risk tier</th>
-              <th>Premium / wk</th>
-              <th>Earnings / wk</th>
-              <th>Registered</th>
-            </tr>
-          </thead>
-          <tbody id="workers-tbody">
-            <tr class="shimmer-row"><td colspan="7"></td></tr>
-          </tbody>
+          <thead><tr><th>Name</th><th>Phone</th><th>City</th><th>Risk</th><th>Premium/wk</th><th>Earnings/wk</th><th>Registered</th></tr></thead>
+          <tbody id="workers-tbody"><tr class="shimmer-row"><td colspan="7"></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -616,155 +371,160 @@
   </div>
 </footer>
 
-<script src="../js/api.js"></script>
+<script src="../js/realtime.js"></script>
 <script>
-const API = window.API_BASE || "http://localhost:5000";
+// ── Auth guard ────────────────────────────────────────────────────────────
+if (!requireAdmin()) { /* redirected */ }
 
 let allClaims   = [];
 let allWorkers  = [];
 let allPolicies = [];
 
-// ── Toast ─────────────────────────────────────────────────────────────────────
-function showToast(msg, type = "") {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.className = `toast ${type ? "toast--" + type : ""} show`;
-  setTimeout(() => t.classList.remove("show"), 3500);
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-function timeAgo(iso) {
-  const diff = Date.now() - new Date(iso);
-  const m = Math.floor(diff / 60000);
+const timeAgo = iso => {
+  const m = Math.floor((Date.now() - new Date(iso)) / 60000);
   if (m < 1)  return "just now";
   if (m < 60) return `${m}m ago`;
   const h = Math.floor(m / 60);
   if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
-}
-function fmtDate(iso) {
-  return new Date(iso).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"2-digit" });
-}
-function fmtTime(iso) {
-  return new Date(iso).toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit" });
-}
-function badgeHtml(text, type) {
-  return `<span class="badge badge--${type}">${text}</span>`;
-}
-function eventIcon(type) {
-  return { rain:"🌧", heat:"🔥", aqi:"💨", flood:"🌊" }[type] || "⚡";
+  return `${Math.floor(h/24)}d ago`;
+};
+const fmtDate = iso => new Date(iso).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"2-digit" });
+const fmtTime = iso => new Date(iso).toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit" });
+const badge   = (text, type) => `<span class="badge badge--${type}">${text}</span>`;
+const eIcon   = t => ({ rain:"🌧", heat:"🔥", aqi:"💨", flood:"🌊" }[t] || "⚡");
+
+// ── WebSocket live updates ────────────────────────────────────────────────
+attachConnectionIndicator("live-dot");
+
+function setLiveActivity(msg) {
+  const el = document.getElementById("live-activity");
+  el.textContent = msg;
+  el.classList.remove("flash");
+  void el.offsetWidth;
+  el.classList.add("flash");
+  setTimeout(() => el.classList.remove("flash"), 3000);
 }
 
-// ── Load stats ────────────────────────────────────────────────────────────────
+ZS_EVENTS.on("ws_connected",    () => setLiveActivity("Connected — watching for live events"));
+ZS_EVENTS.on("ws_disconnected", () => setLiveActivity("Reconnecting…"));
+
+ZS_EVENTS.on("admin_new_worker", data => {
+  setLiveActivity(`👷 New worker: ${data.worker?.name} (${data.worker?.city})`);
+  // Prepend to workers table
+  if (data.worker) {
+    allWorkers.unshift(data.worker);
+    document.getElementById("workers-count").textContent = `${allWorkers.length} registered`;
+    renderWorkers(allWorkers);
+    // Highlight new row
+    const tbody = document.getElementById("workers-tbody");
+    if (tbody.firstElementChild) tbody.firstElementChild.classList.add("new-row");
+    bumpKpi("kpi-workers");
+  }
+  showToast(`👷 ${data.worker?.name} joined from ${data.worker?.city}!`, "success");
+});
+
+ZS_EVENTS.on("admin_new_claim", data => {
+  setLiveActivity(`⚡ Claim: ${data.claim?.workerId?.name} — ${data.claim?.eventType} → ₹${data.claim?.payout}`);
+  if (data.claim) {
+    allClaims.unshift(data.claim);
+    document.getElementById("claims-count").textContent = `${allClaims.length} total`;
+    renderClaims(allClaims);
+    const tbody = document.getElementById("claims-tbody");
+    if (tbody.firstElementChild) tbody.firstElementChild.classList.add("new-row");
+    bumpKpi("kpi-today");
+  }
+  if (data.claim?.status === "flagged") {
+    showToast("⚠️ A claim was flagged for review!", "warn", 5000);
+  } else {
+    showToast(`✅ Claim approved — ₹${data.claim?.payout} payout!`, "success");
+  }
+});
+
+ZS_EVENTS.on("admin_policy_activated", data => {
+  setLiveActivity(`🛡 Policy activated: ${data.workerName} (${data.city})`);
+  bumpKpi("kpi-policies");
+  loadAll();
+});
+
+ZS_EVENTS.on("cron_started", () => setLiveActivity("⏱ Cron job running — fetching live weather…"));
+ZS_EVENTS.on("cron_complete", data => {
+  setLiveActivity(`✅ Cron done — ${data.stats?.triggered || 0} claims fired`);
+  loadAll();
+});
+
+function bumpKpi(id) {
+  const el = document.getElementById(id);
+  el.classList.remove("bumped");
+  void el.offsetWidth;
+  el.classList.add("bumped");
+}
+
+// ── Load stats ────────────────────────────────────────────────────────────
 async function loadStats() {
-  try {
-    const res  = await fetch(`${API}/api/stats`);
-    const data = await res.json();
-    document.getElementById("kpi-workers").textContent  = data.totalWorkers;
-    document.getElementById("kpi-policies").textContent = data.activePolicies;
-    document.getElementById("kpi-today").textContent    = data.claimsToday;
-    document.getElementById("kpi-flagged").textContent  = data.flaggedClaims;
-    document.getElementById("kpi-payout").textContent   = `₹${(data.totalPayout||0).toLocaleString("en-IN")}`;
-    const rate = data.totalClaims > 0
-      ? Math.round((data.approvedClaims / data.totalClaims) * 100) + "%"
-      : "—";
-    document.getElementById("kpi-rate").textContent = rate;
+  const r = await apiFetch("GET", "/api/stats");
+  if (!r?.ok) return;
+  const d = r.data;
+  document.getElementById("kpi-workers").textContent  = d.totalWorkers;
+  document.getElementById("kpi-policies").textContent = d.activePolicies;
+  document.getElementById("kpi-today").textContent    = d.claimsToday;
+  document.getElementById("kpi-flagged").textContent  = d.flaggedClaims;
+  document.getElementById("kpi-payout").textContent   = `₹${(d.totalPayout||0).toLocaleString("en-IN")}`;
+  document.getElementById("kpi-rate").textContent     = d.totalClaims > 0 ? Math.round(d.approvedClaims/d.totalClaims*100)+"%" : "—";
 
-    // Flagged banner
-    if (data.flaggedClaims > 0) {
-      document.getElementById("flagged-banner").classList.add("visible");
-      document.getElementById("flagged-count").textContent = data.flaggedClaims;
-    } else {
-      document.getElementById("flagged-banner").classList.remove("visible");
-    }
-  } catch (err) {
-    console.error("Stats load failed:", err.message);
+  if (d.flaggedClaims > 0) {
+    document.getElementById("flagged-banner").classList.add("visible");
+    document.getElementById("flagged-count").textContent = d.flaggedClaims;
+  } else {
+    document.getElementById("flagged-banner").classList.remove("visible");
   }
 }
 
-// ── Load cron status ──────────────────────────────────────────────────────────
+// ── Load cron status ──────────────────────────────────────────────────────
 async function loadCronStatus() {
-  try {
-    const res  = await fetch(`${API}/api/admin/cron-status`);
-    const data = await res.json();
-    document.getElementById("cron-last").textContent = data.lastRun ? timeAgo(data.lastRun) : "Never";
-    document.getElementById("cron-next").textContent =
-      data.nextRun && data.nextRun !== "pending"
-        ? fmtTime(data.nextRun)
-        : "~30 min";
-    document.getElementById("cron-checked").textContent   = data.stats?.checked   ?? "—";
-    document.getElementById("cron-triggered").textContent = data.stats?.triggered  ?? "—";
-
-    // Render inline log
-    if (data.stats?.results?.length) {
-      renderCronLog(data.stats.results);
-    }
-  } catch {}
+  const r = await apiFetch("GET", "/api/admin/cron-status");
+  if (!r?.ok) return;
+  const d = r.data;
+  document.getElementById("cron-last").textContent     = d.lastRun ? timeAgo(d.lastRun) : "Never";
+  document.getElementById("cron-next").textContent     = d.nextRun && d.nextRun !== "pending" ? fmtTime(d.nextRun) : "~30 min";
+  document.getElementById("cron-checked").textContent  = d.stats?.checked  ?? "—";
+  document.getElementById("cron-triggered").textContent= d.stats?.triggered ?? "—";
+  if (d.stats?.results?.length) renderCronLog(d.stats.results);
 }
 
 function renderCronLog(results) {
-  const log   = document.getElementById("cron-log");
-  const items = document.getElementById("cron-log-items");
-  log.classList.add("visible");
-  items.innerHTML = results.map(r => {
-    if (r.status === "claim_triggered") {
-      return `<div class="cron-log__item triggered">
-        <div>
-          <span class="cron-log__city">${r.city}</span>
-          <span class="cron-log__event"> · ${eventIcon(r.eventType)} ${r.eventType} ${r.eventValue}</span>
-          <span style="font-size:0.73rem;color:var(--ink-faint);margin-left:6px;">${r.workerName || ""}</span>
-        </div>
-        <span class="cron-log__payout">₹${r.payout}</span>
-      </div>`;
-    } else {
-      const reason = r.status === "weather_unavailable" ? "⚠ weather unavailable"
-                   : r.status === "below_threshold"     ? "✓ below threshold"
-                   : r.status;
-      return `<div class="cron-log__item below">
-        <span class="cron-log__city">${r.city}</span>
-        <span class="cron-log__event">${reason}</span>
-      </div>`;
-    }
-  }).join("");
+  document.getElementById("cron-log").classList.add("visible");
+  document.getElementById("cron-log-items").innerHTML = results.map(r =>
+    r.status === "claim_triggered"
+      ? `<div class="cron-log__item triggered">
+           <div><strong>${r.city}</strong> · ${eIcon(r.eventType)} ${r.eventType} ${r.eventValue} <span style="color:var(--ink-faint);font-size:0.73rem;">${r.workerName||""}</span></div>
+           <span class="cron-log__payout">₹${r.payout}</span>
+         </div>`
+      : `<div class="cron-log__item below"><span><strong>${r.city}</strong></span><span>${r.status==="weather_unavailable"?"⚠ unavailable":"✓ below threshold"}</span></div>`
+  ).join("");
 }
 
-// ── Load claims ───────────────────────────────────────────────────────────────
+// ── Load claims ───────────────────────────────────────────────────────────
 async function loadClaims() {
-  try {
-    const res = await fetch(`${API}/api/admin/claims`);
-    allClaims = await res.json();
-    document.getElementById("claims-count").textContent = `${allClaims.length} total`;
-    renderClaims(allClaims);
-  } catch {
-    document.getElementById("claims-tbody").innerHTML =
-      `<tr class="empty-row"><td colspan="6">⚠ Could not load claims — is the server running?</td></tr>`;
-  }
+  const r = await apiFetch("GET", "/api/admin/claims");
+  if (!r?.ok) { document.getElementById("claims-tbody").innerHTML = `<tr class="empty-row"><td colspan="6">⚠ Could not load</td></tr>`; return; }
+  allClaims = r.data;
+  document.getElementById("claims-count").textContent = `${allClaims.length} total`;
+  renderClaims(allClaims);
 }
 
 function renderClaims(claims) {
   const tbody = document.getElementById("claims-tbody");
-  if (!claims.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No claims yet. Auto-triggers when weather thresholds cross.</td></tr>`;
-    return;
-  }
+  if (!claims.length) { tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No claims yet.</td></tr>`; return; }
   tbody.innerHTML = claims.map(c => {
-    const worker = c.workerId;
-    const name   = worker?.name || "—";
-    const city   = worker?.city ? `<span class="muted" style="display:block;font-size:0.73rem;">${worker.city}</span>` : "";
-    const status = c.status === "approved"
-      ? badgeHtml("✓ Approved", "approved")
-      : c.status === "flagged"
-      ? badgeHtml("⚠ Flagged", "flagged")
-      : badgeHtml("Pending", "pending");
-    const source = c.autoTriggered
-      ? badgeHtml("🤖 Auto", "auto")
-      : badgeHtml("Manual", "pending");
+    const w = c.workerId;
+    const statusBadge = c.status === "approved" ? badge("✓ Approved","approved") : c.status === "flagged" ? badge("⚠ Flagged","flagged") : badge("Pending","pending");
+    const srcBadge    = c.autoTriggered ? badge("🤖 Auto","auto") : badge("Manual","pending");
     return `<tr>
-      <td data-label="Worker"><span style="font-weight:500;">${name}</span>${city}</td>
-      <td data-label="Event">${eventIcon(c.eventType)} ${c.eventType||"—"} <span class="muted">${c.eventValue??""}</span></td>
+      <td data-label="Worker"><strong>${w?.name||"—"}</strong><div class="muted" style="font-size:0.73rem;">${w?.city||""}</div></td>
+      <td data-label="Event">${eIcon(c.eventType)} ${c.eventType||"—"} <span class="muted">${c.eventValue??""}</span></td>
       <td data-label="Payout" style="font-weight:600;color:var(--success);">${c.payout ? `₹${c.payout}` : "—"}</td>
-      <td data-label="Status">${status}</td>
-      <td data-label="Source">${source}</td>
+      <td data-label="Status">${statusBadge}</td>
+      <td data-label="Source">${srcBadge}</td>
       <td data-label="Time" class="muted no-wrap">${timeAgo(c.createdAt)}</td>
     </tr>`;
   }).join("");
@@ -778,146 +538,112 @@ function filterClaims(type, el) {
   else renderClaims(allClaims.filter(c => c.status === type));
 }
 
-// ── Load policies ─────────────────────────────────────────────────────────────
+// ── Load policies ─────────────────────────────────────────────────────────
 async function loadPolicies() {
-  try {
-    const res = await fetch(`${API}/api/admin/policies`);
-    allPolicies = await res.json();
-    document.getElementById("policies-count").textContent = `${allPolicies.length} active`;
-    renderPolicies(allPolicies);
-    buildCityBreakdown(allPolicies);
-  } catch {
-    document.getElementById("policies-tbody").innerHTML =
-      `<tr class="empty-row"><td colspan="5">⚠ Could not load policies.</td></tr>`;
-  }
+  const r = await apiFetch("GET", "/api/admin/policies");
+  if (!r?.ok) return;
+  allPolicies = r.data;
+  document.getElementById("policies-count").textContent = `${allPolicies.length} active`;
+  renderPolicies(allPolicies);
+  buildCityGrid(allPolicies);
 }
 
 function renderPolicies(policies) {
   const tbody = document.getElementById("policies-tbody");
-  if (!policies.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="5">No active policies yet.</td></tr>`;
-    return;
-  }
+  if (!policies.length) { tbody.innerHTML = `<tr class="empty-row"><td colspan="5">No active policies.</td></tr>`; return; }
   tbody.innerHTML = policies.map(p => {
     const w = p.workerId;
     return `<tr>
-      <td data-label="Worker"><span class="policy-row-name">${w?.name || "—"}</span></td>
-      <td data-label="City" class="muted">${w?.city || "—"}</td>
-      <td data-label="Premium" style="font-weight:500;">₹${w?.premium || p.premium}/wk</td>
-      <td data-label="Coverage" class="policy-row-coverage">₹${p.coverage}</td>
+      <td data-label="Worker"><strong>${w?.name||"—"}</strong></td>
+      <td data-label="City" class="muted">${w?.city||"—"}</td>
+      <td data-label="Premium" style="font-weight:500;">₹${w?.premium||p.premium}/wk</td>
+      <td data-label="Coverage" style="color:var(--success);font-weight:600;">₹${p.coverage}</td>
       <td data-label="Since" class="muted no-wrap">${fmtDate(p.activatedAt)}</td>
     </tr>`;
   }).join("");
 }
 
-function filterPolicies(query) {
-  const q = query.toLowerCase();
-  const filtered = allPolicies.filter(p => {
-    const w = p.workerId;
-    return (w?.name||"").toLowerCase().includes(q) || (w?.city||"").toLowerCase().includes(q);
-  });
-  renderPolicies(filtered);
+function filterPolicies(q) {
+  q = q.toLowerCase();
+  renderPolicies(allPolicies.filter(p => (p.workerId?.name||"").toLowerCase().includes(q) || (p.workerId?.city||"").toLowerCase().includes(q)));
 }
 
-// ── City breakdown ────────────────────────────────────────────────────────────
-function buildCityBreakdown(policies) {
-  const cityMap = {};
+// ── City breakdown ────────────────────────────────────────────────────────
+function buildCityGrid(policies) {
+  const map = {};
   for (const p of policies) {
     const city = p.workerId?.city || "Unknown";
-    if (!cityMap[city]) cityMap[city] = { workers: 0, coverage: 0 };
-    cityMap[city].workers++;
-    cityMap[city].coverage += p.coverage || 0;
+    if (!map[city]) map[city] = { workers:0, coverage:0 };
+    map[city].workers++;
+    map[city].coverage += p.coverage || 0;
   }
-  const cities = Object.entries(cityMap).sort((a,b) => b[1].workers - a[1].workers);
+  const cities = Object.entries(map).sort((a,b) => b[1].workers - a[1].workers);
   document.getElementById("city-count").textContent = `${cities.length} cities`;
-  const grid = document.getElementById("city-grid");
-  if (!cities.length) {
-    grid.innerHTML = `<div class="city-card"><div class="city-card__name" style="color:var(--ink-faint);">No active policies yet</div></div>`;
-    return;
-  }
-  grid.innerHTML = cities.map(([city, data]) => `
-    <div class="city-card">
-      <div class="city-card__name">${city}</div>
-      <div class="city-card__meta">
-        <span>Workers <span class="val">${data.workers}</span></span>
-        <span>Coverage <span class="val">₹${data.coverage.toLocaleString("en-IN")}</span></span>
-      </div>
-    </div>`).join("");
+  document.getElementById("city-grid").innerHTML = cities.length
+    ? cities.map(([city, d]) => `<div class="city-card"><div class="city-card__name">${city}</div><div class="city-card__meta"><span>Workers <span class="val">${d.workers}</span></span><span>Exposure <span class="val">₹${d.coverage.toLocaleString("en-IN")}</span></span></div></div>`).join("")
+    : `<div class="city-card"><div class="city-card__name" style="color:var(--ink-faint);">No active policies yet</div></div>`;
 }
 
-// ── Load workers ──────────────────────────────────────────────────────────────
+// ── Load workers ──────────────────────────────────────────────────────────
 async function loadWorkers() {
-  try {
-    const res = await fetch(`${API}/api/admin/workers`);
-    allWorkers = await res.json();
-    document.getElementById("workers-count").textContent = `${allWorkers.length} registered`;
-    renderWorkers(allWorkers);
-  } catch {
-    document.getElementById("workers-tbody").innerHTML =
-      `<tr class="empty-row"><td colspan="7">⚠ Could not load workers.</td></tr>`;
-  }
+  const r = await apiFetch("GET", "/api/admin/workers");
+  if (!r?.ok) return;
+  allWorkers = r.data;
+  document.getElementById("workers-count").textContent = `${allWorkers.length} registered`;
+  renderWorkers(allWorkers);
 }
 
 function renderWorkers(workers) {
   const tbody = document.getElementById("workers-tbody");
-  if (!workers.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No workers registered yet.</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = workers.map(w => `
-    <tr>
-      <td data-label="Name" style="font-weight:500;">${w.name}</td>
-      <td data-label="Phone" class="muted">${w.phone}</td>
-      <td data-label="City">${w.city}</td>
-      <td data-label="Risk">${badgeHtml(w.riskTier||"—", w.riskTier||"low")}</td>
-      <td data-label="Premium" style="font-weight:600;">₹${w.premium}</td>
-      <td data-label="Earnings" class="muted">₹${(w.weeklyEarnings||0).toLocaleString("en-IN")}</td>
-      <td data-label="Registered" class="muted no-wrap">${fmtDate(w.registeredAt)}</td>
-    </tr>`).join("");
+  if (!workers.length) { tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No workers yet.</td></tr>`; return; }
+  tbody.innerHTML = workers.map(w => `<tr>
+    <td data-label="Name" style="font-weight:500;">${w.name}</td>
+    <td data-label="Phone" class="muted">${w.phone}</td>
+    <td data-label="City">${w.city}</td>
+    <td data-label="Risk">${badge(w.riskTier||"—", w.riskTier||"low")}</td>
+    <td data-label="Premium" style="font-weight:600;">₹${w.premium}</td>
+    <td data-label="Earnings" class="muted">₹${(w.weeklyEarnings||0).toLocaleString("en-IN")}</td>
+    <td data-label="Registered" class="muted no-wrap">${fmtDate(w.registeredAt)}</td>
+  </tr>`).join("");
 }
 
-function filterWorkers(query) {
-  const q = query.toLowerCase();
-  renderWorkers(allWorkers.filter(w =>
-    w.name.toLowerCase().includes(q) || w.phone.includes(q)
-  ));
+function filterWorkers(q) {
+  q = q.toLowerCase();
+  renderWorkers(allWorkers.filter(w => w.name.toLowerCase().includes(q) || w.phone.includes(q)));
 }
 
-// ── Run cron ──────────────────────────────────────────────────────────────────
+// ── Run cron ──────────────────────────────────────────────────────────────
 async function runCron() {
-  const btn = document.getElementById("cron-btn");
-  btn.textContent = "Running…";
-  btn.disabled = true;
-  try {
-    const res  = await fetch(`${API}/api/admin/run-cron`, { method: "POST" });
-    const data = await res.json();
-    const r = data.result;
-    renderCronLog(r.results || []);
-    document.getElementById("cron-checked").textContent   = r.checked;
-    document.getElementById("cron-triggered").textContent = r.triggered;
+  const btn = document.getElementById("btn-cron");
+  btn.textContent = "Running…"; btn.disabled = true;
+  const r = await apiFetch("POST", "/api/admin/run-cron");
+  if (r?.ok) {
+    const res = r.data.result;
+    renderCronLog(res.results || []);
+    document.getElementById("cron-checked").textContent   = res.checked;
+    document.getElementById("cron-triggered").textContent = res.triggered;
     document.getElementById("cron-last").textContent      = "just now";
-    if (r.triggered > 0) {
-      showToast(`✅ Cron fired ${r.triggered} claim${r.triggered>1?"s":""}!`, "success");
-    } else {
-      showToast(`✓ Cron done — ${r.checked} cities checked, no thresholds crossed.`);
-    }
-    await loadAll();
-  } catch (err) {
-    showToast("⚠ Cron failed — is the server running?", "warn");
-  } finally {
-    btn.textContent = "▶ Run cron now";
-    btn.disabled = false;
+    showToast(res.triggered > 0 ? `✅ ${res.triggered} claim${res.triggered>1?"s":""} fired!` : `✓ ${res.checked} cities checked — no thresholds crossed.`, res.triggered > 0 ? "success" : "");
+    loadAll();
+  } else {
+    showToast("⚠ Cron failed", "error");
   }
+  btn.textContent = "▶ Run cron now"; btn.disabled = false;
 }
 
-// ── Load all ──────────────────────────────────────────────────────────────────
+// ── Logout ────────────────────────────────────────────────────────────────
+async function logout() {
+  await apiFetch("POST", "/api/auth/logout");
+  ZS_AUTH.clear();
+  location.href = "login.html";
+}
+
+// ── Load all ──────────────────────────────────────────────────────────────
 async function loadAll() {
-  document.getElementById("last-updated").textContent =
-    "Updated " + new Date().toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit" });
+  document.getElementById("last-updated").textContent = "Updated " + new Date().toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit" });
   await Promise.all([loadStats(), loadCronStatus(), loadClaims(), loadPolicies(), loadWorkers()]);
 }
 
-// Auto-refresh every 60 seconds
 loadAll();
 setInterval(loadAll, 60_000);
 </script>

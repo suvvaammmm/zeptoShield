@@ -5,6 +5,108 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Register — ZeptoShield</title>
   <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .reg-wrap { max-width: 520px; margin: 0 auto; padding: 88px 24px 64px; }
+
+    .reg-eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--accent);
+      background: var(--accent-dim); padding: 5px 12px;
+      border-radius: 99px; margin-bottom: 16px;
+    }
+    .reg-title {
+      font-family: var(--serif);
+      font-size: clamp(1.75rem, 5vw, 2.25rem);
+      color: var(--ink); letter-spacing: -0.02em;
+      line-height: 1.15; margin-bottom: 8px;
+    }
+    .reg-sub { font-size: 0.875rem; color: var(--ink-soft); margin-bottom: 32px; }
+
+    .reg-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px 28px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* Premium preview card */
+    .premium-preview {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 18px 20px;
+      margin-top: 20px; display: none;
+      animation: fadein 0.3s ease;
+    }
+    .premium-preview.visible { display: block; }
+    @keyframes fadein { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+
+    .premium-preview__label {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--ink-faint); margin-bottom: 4px;
+    }
+    .premium-preview__price {
+      font-family: var(--serif); font-size: 2.25rem;
+      color: var(--ink); letter-spacing: -0.03em; line-height: 1;
+    }
+    .premium-preview__price span { font-size: 1rem; color: var(--ink-soft); font-family: var(--sans); }
+    .premium-preview__sub { font-size: 0.78rem; color: var(--ink-faint); margin-top: 6px; }
+    .premium-preview__breakdown {
+      margin-top: 14px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .risk-bar-row { display: flex; align-items: center; gap: 10px; }
+    .risk-bar-row__label { font-size: 0.73rem; color: var(--ink-soft); width: 110px; flex-shrink: 0; }
+    .risk-bar { flex: 1; height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .risk-bar__fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width 0.5s ease; }
+    .risk-bar-row__pct { font-size: 0.72rem; color: var(--ink-faint); width: 30px; text-align: right; }
+
+    /* Risk tier badge */
+    .tier-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em; padding: 3px 10px; border-radius: 99px;
+    }
+    .tier-badge--high   { background: #fef2f2; color: #b91c1c; }
+    .tier-badge--medium { background: #fffbeb; color: var(--warn); }
+    .tier-badge--low    { background: #f0fdf4; color: var(--success); }
+
+    .field-error {
+      font-size: 0.8rem; color: #b91c1c;
+      background: #fef2f2; border: 1px solid #fecaca;
+      border-radius: 8px; padding: 9px 13px;
+      margin-top: 10px; display: none;
+    }
+    .field-error.visible { display: block; }
+
+    /* Success state */
+    .reg-success {
+      text-align: center; display: none; padding: 20px 0;
+    }
+    .reg-success.visible { display: block; }
+    .reg-success__icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .reg-success__title {
+      font-family: var(--serif); font-size: 1.5rem;
+      color: var(--ink); margin-bottom: 8px;
+    }
+    .reg-success__sub { font-size: 0.875rem; color: var(--ink-soft); margin-bottom: 20px; }
+
+    /* Live activity feed */
+    .live-feed {
+      position: fixed; bottom: 24px; left: 24px;
+      max-width: 280px; z-index: 100;
+      display: flex; flex-direction: column; gap: 8px;
+      pointer-events: none;
+    }
+    .feed-item {
+      background: var(--ink); color: var(--white);
+      font-size: 0.78rem; padding: 10px 14px;
+      border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      animation: slide-up 0.3s ease;
+      pointer-events: auto;
+    }
+    @keyframes slide-up { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+  </style>
 </head>
 <body>
 
@@ -13,96 +115,109 @@
     <a class="nav__logo" href="../index.html">Zepto<span>Shield</span></a>
     <div class="nav__links">
       <button class="nav__link" onclick="location.href='how.html'">How it works</button>
-      <button class="nav__link" onclick="location.href='lookup.html'">My policy</button>
-      <button class="nav__cta nav__link--active">Get protected</button>
+      <button class="nav__link" onclick="location.href='login.html'">Login</button>
+      <button class="nav__cta nav__link--active" style="background:var(--accent);">Get protected</button>
     </div>
   </div>
 </nav>
 
+<!-- Live activity feed -->
+<div class="live-feed" id="live-feed"></div>
+
 <main class="page fade-in">
-  <div class="form-wrap">
-    <div class="hero__eyebrow" style="display:inline-flex; margin-bottom:16px;">New account</div>
-    <h1 class="form-page__title">Create your shield.</h1>
-    <p class="form-page__sub">
-      Already registered? <a onclick="location.href='lookup.html'">Look up your policy →</a>
-    </p>
+  <div class="reg-wrap">
+    <div class="reg-eyebrow">🛡 Create account</div>
+    <h1 class="reg-title">Get covered in<br>under 2 minutes.</h1>
+    <p class="reg-sub">Already registered? <a href="login.html" style="color:var(--accent); font-weight:500;">Log in →</a></p>
 
-    <div class="form-card">
-      <div class="form-group">
-        <label class="form-label" for="name">Full name</label>
-        <input class="form-input" id="name" type="text" placeholder="Rahul Sharma" autocomplete="name" />
-      </div>
+    <div class="reg-card">
 
-      <div class="form-group">
-        <label class="form-label" for="phone">Mobile number</label>
-        <input class="form-input" id="phone" type="tel" placeholder="9876543210" maxlength="10" inputmode="numeric" />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="city">Your city</label>
-        <div class="select-wrap">
-          <select class="form-select" id="city">
-            <option value="">Select city</option>
-            <optgroup label="High Risk">
-              <option>Mumbai</option>
-              <option>Chennai</option>
-              <option>Kolkata</option>
-              <option>Hyderabad</option>
-            </optgroup>
-            <optgroup label="Medium Risk">
-              <option>Bengaluru</option>
-              <option>Delhi</option>
-              <option>Pune</option>
-              <option>Ahmedabad</option>
-            </optgroup>
-            <optgroup label="Low Risk">
-              <option>Jaipur</option>
-              <option>Surat</option>
-              <option>Lucknow</option>
-              <option>Bhubaneswar</option>
-              <option>Nagpur</option>
-              <option>Indore</option>
-              <option>Visakhapatnam</option>
-              <option>Coimbatore</option>
-            </optgroup>
-          </select>
+      <!-- Form -->
+      <div id="reg-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="inp-name">Full name</label>
+            <input class="form-input" id="inp-name" type="text" placeholder="Ravi Kumar" autocomplete="name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inp-phone">Mobile number</label>
+            <div style="position:relative;">
+              <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:0.9rem;pointer-events:none;">+91</span>
+              <input class="form-input" id="inp-phone" type="tel" placeholder="9876543210"
+                maxlength="10" inputmode="numeric" style="padding-left:44px;" autocomplete="tel-national" />
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label class="form-label" for="earnings">Weekly earnings (₹)</label>
-        <input class="form-input" id="earnings" type="number" placeholder="6000" inputmode="numeric" />
-      </div>
+        <div class="form-row" style="margin-top:16px;">
+          <div class="form-group">
+            <label class="form-label" for="inp-city">City</label>
+            <div class="select-wrap">
+              <select class="form-select" id="inp-city" onchange="updatePremiumPreview()">
+                <option value="">Select city</option>
+                <option>Mumbai</option><option>Chennai</option><option>Kolkata</option>
+                <option>Hyderabad</option><option>Bengaluru</option><option>Delhi</option>
+                <option>Pune</option><option>Ahmedabad</option><option>Jaipur</option>
+                <option>Surat</option><option>Lucknow</option><option selected>Bhubaneswar</option>
+                <option>Nagpur</option><option>Indore</option><option>Visakhapatnam</option>
+                <option>Coimbatore</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inp-earnings">Weekly earnings (₹)</label>
+            <input class="form-input" id="inp-earnings" type="number"
+              placeholder="6000" value="6000" min="1000" max="50000" inputmode="numeric"
+              onchange="updatePremiumPreview()" />
+          </div>
+        </div>
 
-      <!-- ML Premium Preview -->
-      <div id="ml-preview" style="display:none; margin-bottom: 20px;">
-        <div class="preview-box" style="align-items: flex-start; flex-direction: column; gap: 12px;">
-          <div style="display:flex; width:100%; align-items:center; justify-content:space-between;">
+        <div class="form-group" style="margin-top:16px;">
+          <label class="form-label" for="inp-upi">
+            UPI ID <span style="color:var(--ink-faint);font-weight:400;">(for automatic payouts)</span>
+          </label>
+          <input class="form-input" id="inp-upi" type="text"
+            placeholder="yourname@upi" autocomplete="off" />
+        </div>
+
+        <!-- ML Premium Preview -->
+        <div class="premium-preview" id="premium-preview">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
             <div>
-              <div class="preview-box__label">ML-calculated weekly premium</div>
-              <div class="preview-box__val" id="preview-price">—</div>
-              <div style="font-size:0.73rem; color:var(--ink-faint); margin-top:3px;">Coverage up to ₹1,500 / week</div>
+              <div class="premium-preview__label">ML-calculated weekly premium</div>
+              <div class="premium-preview__price">
+                ₹<span id="prev-premium">—</span>
+                <span>/week</span>
+              </div>
+              <div class="premium-preview__sub">Coverage: ₹1,500 per week</div>
             </div>
             <div style="text-align:right;">
-              <span class="preview-box__zone" id="preview-zone">—</span>
-              <div style="margin-top:6px;"><span class="ml-badge">🤖 ML model</span></div>
+              <div class="premium-preview__label">Risk tier</div>
+              <div id="prev-tier-badge" style="margin-top:4px;"></div>
             </div>
           </div>
-
-          <!-- Risk breakdown bars -->
-          <div class="ml-breakdown" id="ml-breakdown" style="width:100%;">
-            <div class="ml-breakdown__title">Risk factor breakdown</div>
-            <div id="breakdown-bars"></div>
-            <div style="margin-top:10px; font-size:0.72rem; color:var(--ink-faint);">
-              Model: GradientBoostingRegressor · Confidence: <span id="ml-confidence">—</span>
-            </div>
-          </div>
+          <div class="premium-preview__breakdown" id="prev-breakdown"></div>
         </div>
+
+        <div class="field-error" id="reg-err"></div>
+
+        <button class="btn btn--primary btn--full" id="btn-register" style="margin-top:24px;">
+          Create account →
+        </button>
+
+        <p style="font-size:0.73rem;color:var(--ink-faint);text-align:center;margin-top:12px;line-height:1.5;">
+          By registering you accept our terms. Your phone number is verified via OTP before registration.
+        </p>
       </div>
 
-      <button class="btn btn--primary btn--full" id="register-btn">
-        Activate my ZeptoShield
-      </button>
+      <!-- Success state -->
+      <div class="reg-success" id="reg-success">
+        <div class="reg-success__icon">🎉</div>
+        <div class="reg-success__title">You're protected!</div>
+        <p class="reg-success__sub" id="success-msg">Your account is ready. Activate your policy to start receiving payouts.</p>
+        <button class="btn btn--primary btn--full" id="btn-to-dashboard">Go to dashboard →</button>
+      </div>
+
     </div>
   </div>
 
@@ -114,91 +229,148 @@
   </footer>
 </main>
 
-<script src="../js/api.js"></script>
-<script src="../js/app.js"></script>
+<script src="../js/realtime.js"></script>
 <script>
-  const RISK_COLORS = { low: "var(--success)", medium: "var(--warn)", high: "#B91C1C" };
-  const TIER_LABELS = { low: "Low Risk", medium: "Medium Risk", high: "High Risk" };
-  let debounceTimer = null;
+const CITY_RISK = {
+  Mumbai:{rain:2400,temp:38,aqi:145,flood:3.2},Chennai:{rain:1400,temp:42,aqi:120,flood:2.1},
+  Kolkata:{rain:1800,temp:40,aqi:180,flood:2.8},Hyderabad:{rain:900,temp:42,aqi:130,flood:1.5},
+  Bengaluru:{rain:970,temp:35,aqi:95,flood:0.8},Delhi:{rain:750,temp:45,aqi:280,flood:0.5},
+  Pune:{rain:720,temp:38,aqi:85,flood:0.6},Ahmedabad:{rain:800,temp:46,aqi:150,flood:0.4},
+  Jaipur:{rain:550,temp:46,aqi:170,flood:0.2},Surat:{rain:1200,temp:38,aqi:130,flood:1.0},
+  Lucknow:{rain:900,temp:44,aqi:200,flood:0.6},Bhubaneswar:{rain:1500,temp:40,aqi:100,flood:1.8},
+  Nagpur:{rain:1100,temp:47,aqi:110,flood:0.7},Indore:{rain:950,temp:43,aqi:120,flood:0.5},
+  Visakhapatnam:{rain:1100,temp:40,aqi:90,flood:1.2},Coimbatore:{rain:700,temp:36,aqi:80,flood:0.4},
+};
 
-  function riskTierFromScore(score) {
-    return score >= 0.6 ? "high" : score >= 0.35 ? "medium" : "low";
+function calcPremium(city, weeklyEarnings = 6000) {
+  const cf = CITY_RISK[city] || {rain:900,temp:40,aqi:120,flood:0.8};
+  const rainS  = Math.min(cf.rain / 2400, 1);
+  const tempS  = Math.max((cf.temp - 30) / 20, 0);
+  const aqiS   = Math.min(cf.aqi  / 350,  1);
+  const floodS = Math.min(cf.flood / 4,   1);
+  const overall = rainS*0.30 + tempS*0.20 + aqiS*0.15 + floodS*0.35;
+  const premium = Math.round(20 + overall * 30 + (weeklyEarnings / 12000) * 10);
+  const tier    = overall >= 0.6 ? "high" : overall >= 0.35 ? "medium" : "low";
+  return { premium, overall, tier,
+    breakdown: {
+      "Rainfall risk":     +(rainS*100).toFixed(1),
+      "Temperature risk":  +(tempS*100).toFixed(1),
+      "AQI risk":          +(aqiS*100).toFixed(1),
+      "Flood risk":        +(floodS*100).toFixed(1),
+    }
+  };
+}
+
+function updatePremiumPreview() {
+  const city     = document.getElementById("inp-city").value;
+  const earnings = parseFloat(document.getElementById("inp-earnings").value) || 6000;
+  if (!city) return;
+
+  const { premium, tier, breakdown } = calcPremium(city, earnings);
+  document.getElementById("prev-premium").textContent = premium;
+
+  const tierLabels = { high:"🔴 High risk", medium:"🟡 Medium risk", low:"🟢 Low risk" };
+  document.getElementById("prev-tier-badge").innerHTML =
+    `<span class="tier-badge tier-badge--${tier}">${tierLabels[tier]}</span>`;
+
+  document.getElementById("prev-breakdown").innerHTML = Object.entries(breakdown).map(([label, val]) => `
+    <div class="risk-bar-row">
+      <div class="risk-bar-row__label">${label}</div>
+      <div class="risk-bar"><div class="risk-bar__fill" style="width:${val}%"></div></div>
+      <div class="risk-bar-row__pct">${val}%</div>
+    </div>`).join("");
+
+  document.getElementById("premium-preview").classList.add("visible");
+}
+
+// Pre-fill phone from URL param
+const urlPhone = new URLSearchParams(location.search).get("phone");
+if (urlPhone) document.getElementById("inp-phone").value = urlPhone;
+
+// If already logged in, fill phone from session
+const sessionPhone = ZS_AUTH.getPhone();
+if (sessionPhone && !urlPhone) document.getElementById("inp-phone").value = sessionPhone;
+
+// Initial preview
+updatePremiumPreview();
+
+// ── Register ────────────────────────────────────────────────────────────────
+document.getElementById("btn-register").addEventListener("click", async () => {
+  const name    = document.getElementById("inp-name").value.trim();
+  const phone   = document.getElementById("inp-phone").value.trim();
+  const city    = document.getElementById("inp-city").value;
+  const earnings= document.getElementById("inp-earnings").value;
+  const upiId   = document.getElementById("inp-upi").value.trim();
+  const errEl   = document.getElementById("reg-err");
+
+  errEl.classList.remove("visible");
+
+  if (!name)            return showErr("reg", "Name is required.");
+  if (!/^\d{10}$/.test(phone)) return showErr("reg", "Valid 10-digit phone required.");
+  if (!city)            return showErr("reg", "Please select your city.");
+
+  // Check if user is authenticated — if not, need to verify OTP first
+  if (!ZS_AUTH.isLoggedIn() || ZS_AUTH.getPhone() !== phone) {
+    // Redirect to login with phone pre-filled, come back after
+    location.href = `login.html?phone=${phone}&next=${encodeURIComponent(location.pathname + location.search)}`;
+    return;
   }
 
-  function updatePreview() {
-    const city     = document.getElementById("city").value;
-    const earnings = parseFloat(document.getElementById("earnings").value) || 6000;
-    if (!city) { document.getElementById("ml-preview").style.display = "none"; return; }
+  const btn = document.getElementById("btn-register");
+  btn.textContent = "Creating account…"; btn.disabled = true;
 
-    // Show immediately with mock data (instant feedback)
-    const ml   = ZS.mockPremium(city, earnings);
-    const tier = riskTierFromScore(ml.risk_score);
-    renderPreview(ml, tier);
-  }
-
-  function renderPreview(ml, tier) {
-    document.getElementById("ml-preview").style.display = "block";
-    document.getElementById("preview-price").textContent = `₹${ml.premium} / week`;
-    const zoneEl = document.getElementById("preview-zone");
-    zoneEl.textContent = TIER_LABELS[tier];
-    zoneEl.style.color = RISK_COLORS[tier];
-    zoneEl.style.borderColor = RISK_COLORS[tier];
-    document.getElementById("ml-confidence").textContent = `${(ml.confidence * 100).toFixed(0)}%`;
-
-    const bd = ml.breakdown;
-    const rows = [
-      { label: "Rainfall risk",    val: bd.rainfall_risk    },
-      { label: "Temperature risk", val: bd.temperature_risk },
-      { label: "AQI risk",         val: bd.aqi_risk         },
-      { label: "Flood risk",       val: bd.flood_risk       },
-    ];
-    document.getElementById("breakdown-bars").innerHTML = rows.map(r => `
-      <div class="breakdown-row">
-        <div class="breakdown-row__label">${r.label}</div>
-        <div class="breakdown-bar"><div class="breakdown-bar__fill" style="width:${r.val}%"></div></div>
-        <div class="breakdown-row__pct">${r.val}%</div>
-      </div>
-    `).join("");
-  }
-
-  document.getElementById("city").addEventListener("change", updatePreview);
-  document.getElementById("earnings").addEventListener("input", () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(updatePreview, 400);
+  const result = await apiFetch("POST", "/api/workers/register", {
+    name, city, weeklyEarnings: parseFloat(earnings) || 6000, upiId: upiId || null,
   });
 
-  document.getElementById("register-btn").addEventListener("click", async () => {
-    const name     = document.getElementById("name").value.trim();
-    const phone    = document.getElementById("phone").value.trim();
-    const city     = document.getElementById("city").value;
-    const earnings = document.getElementById("earnings").value;
-
-    if (!name || !phone || !city) {
-      Toast.show({ type: "error", title: "Missing fields", sub: "Please fill in all required fields." });
+  if (!result || !result.ok) {
+    const msg = result?.data?.error || "Registration failed.";
+    if (msg.includes("Already registered")) {
+      // Already exists — go to dashboard
+      location.href = `dashboard.html?phone=${phone}`;
       return;
     }
-    if (phone.length < 10) {
-      Toast.show({ type: "error", title: "Invalid number", sub: "Enter your 10-digit mobile number." });
-      return;
-    }
+    showErr("reg", msg);
+    btn.textContent = "Create account →"; btn.disabled = false;
+    return;
+  }
 
-    const btn = document.getElementById("register-btn");
-    btn.disabled = true; btn.textContent = "Calculating your premium…";
+  const worker = result.data.worker;
+  ZS_AUTH.save({ worker });
 
-    const data = await ZS.api("POST", "/workers/register", {
-      name, phone, city, weeklyEarnings: earnings || 6000
-    });
+  // Show success
+  document.getElementById("reg-form").style.display = "none";
+  document.getElementById("reg-success").classList.add("visible");
+  document.getElementById("success-msg").textContent =
+    `Welcome, ${worker.name}! Your ML-calculated premium is ₹${worker.premium}/week with ₹1,500 coverage.`;
+  document.getElementById("btn-to-dashboard").onclick =
+    () => location.href = `dashboard.html?phone=${phone}`;
+  setTimeout(() => location.href = `dashboard.html?phone=${phone}`, 2500);
+});
 
-    btn.disabled = false; btn.textContent = "Activate my ZeptoShield";
+function showErr(panel, msg) {
+  const el = document.getElementById(`${panel}-err`);
+  el.textContent = msg; el.classList.add("visible");
+}
 
-    if (data.error && data.error !== "Already registered") {
-      Toast.show({ type: "error", title: "Error", sub: data.error }); return;
-    }
+// ── Real-time: show live activity from other registrations ─────────────────
+ZS_EVENTS.on("admin_new_worker", data => {
+  if (data.worker?.city) {
+    pushFeed(`👷 New worker joined from ${data.worker.city}`);
+  }
+});
+ZS_EVENTS.on("admin_new_claim", data => {
+  pushFeed(`⚡ Claim triggered — ${data.claim?.workerId?.city || "a city"}`);
+});
 
-    const suffix = data.ml_used ? " · ML model" : "";
-    Toast.show({ type: "success", title: "Welcome to ZeptoShield!", sub: `₹${data.worker.premium}/week${suffix}` });
-    setTimeout(() => { location.href = `dashboard.html?phone=${phone}`; }, 1100);
-  });
+function pushFeed(msg) {
+  const feed = document.getElementById("live-feed");
+  const item = document.createElement("div");
+  item.className = "feed-item";
+  item.textContent = msg;
+  feed.appendChild(item);
+  setTimeout(() => item.remove(), 5000);
+}
 </script>
 </body>
 </html>

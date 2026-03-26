@@ -6,121 +6,144 @@
   <title>Login — ZeptoShield</title>
   <link rel="stylesheet" href="../css/style.css" />
   <style>
-    .otp-wrap {
-      max-width: 440px;
-      margin: 0 auto;
-      padding: 80px 24px 64px;
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 16px 40px;
+      background: var(--surface);
     }
 
-    .otp-eyebrow {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 0.75rem; font-weight: 500;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      color: var(--accent); background: var(--accent-dim);
-      padding: 5px 12px; border-radius: 99px;
-      margin-bottom: 16px;
+    .login-box {
+      width: 100%;
+      max-width: 420px;
     }
 
-    .otp-title {
+    .login-brand {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-brand__logo {
       font-family: var(--serif);
-      font-size: clamp(1.75rem, 5vw, 2.25rem);
-      color: var(--ink); line-height: 1.15;
-      letter-spacing: -0.02em; margin-bottom: 8px;
+      font-size: 1.75rem;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -0.01em;
     }
-    .otp-sub {
-      font-size: 0.875rem; color: var(--ink-soft); margin-bottom: 32px;
+    .login-brand__logo span { color: var(--accent); }
+    .login-brand__sub {
+      font-size: 0.8rem;
+      color: var(--ink-faint);
+      margin-top: 4px;
     }
-    .otp-sub a { color: var(--accent); cursor: pointer; text-decoration: none; font-weight: 500; }
-    .otp-sub a:hover { text-decoration: underline; }
 
     /* ── Mode toggle ── */
     .mode-toggle {
-      display: flex; gap: 0;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      display: flex;
+      background: var(--border);
+      border-radius: 10px;
       padding: 3px;
-      margin-bottom: 24px;
-      width: 100%;
+      margin-bottom: 20px;
     }
     .mode-btn {
       flex: 1; background: none; border: none;
       font-family: var(--sans); font-size: 0.835rem; font-weight: 500;
-      color: var(--ink-soft); padding: 8px 0;
-      border-radius: calc(var(--radius-sm) - 2px);
-      cursor: pointer; transition: all 0.15s;
+      color: var(--ink-soft); padding: 9px 0;
+      border-radius: 8px; cursor: pointer;
+      transition: all 0.18s;
     }
     .mode-btn--active {
       background: var(--white);
       color: var(--ink);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.1);
     }
 
-    .otp-card {
+    /* ── Card ── */
+    .login-card {
       background: var(--white);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 24px;
+      border-radius: 16px;
+      padding: 32px 28px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.04);
     }
 
     /* ── Steps ── */
     .steps {
-      display: flex; align-items: center; gap: 0;
+      display: flex; align-items: center;
       margin-bottom: 28px;
     }
-    .step {
-      display: flex; align-items: center; gap: 8px; flex: 1;
-    }
+    .step { display: flex; align-items: center; gap: 8px; flex: 1; }
     .step__dot {
-      width: 28px; height: 28px; border-radius: 50%;
+      width: 30px; height: 30px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; font-weight: 600; flex-shrink: 0;
-      transition: all 0.25s;
+      font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+      transition: all 0.25s ease;
     }
     .step__dot--active  { background: var(--ink); color: var(--white); }
     .step__dot--done    { background: var(--success); color: var(--white); }
     .step__dot--pending { background: var(--border); color: var(--ink-faint); }
     .step__label { font-size: 0.75rem; color: var(--ink-soft); font-weight: 500; }
-    .step__line {
-      flex: 1; height: 2px;
-      background: var(--border); margin: 0 8px;
-      border-radius: 2px; transition: background 0.3s;
+    .step__line  {
+      flex: 1; height: 2px; background: var(--border);
+      margin: 0 6px; border-radius: 2px; transition: background 0.3s;
     }
     .step__line--done { background: var(--success); }
 
-    /* ── Panels ── */
-    #panel-phone, #panel-otp, #panel-done { display: none; }
-    #panel-phone { display: block; }
-
-    /* ── Phone input ── */
-    .phone-input-wrap {
+    /* ── Phone panel ── */
+    .input-with-prefix {
       position: relative;
     }
-    .phone-prefix {
-      position: absolute; left: 14px; top: 50%;
+    .input-prefix {
+      position: absolute; left: 13px; top: 50%;
       transform: translateY(-50%);
-      color: var(--ink-soft); font-size: 0.9rem;
-      pointer-events: none;
+      font-size: 0.9rem; color: var(--ink-soft);
+      pointer-events: none; font-weight: 500;
     }
-    .phone-input-wrap .form-input {
-      padding-left: 44px;
-    }
+    .input-with-prefix .form-input { padding-left: 44px; }
 
     /* ── OTP boxes ── */
+    .otp-target-text {
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--ink-soft);
+      margin-bottom: 16px;
+    }
+    .otp-target-text strong { color: var(--ink); }
+
+    .demo-banner {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #f0fdf4; border: 1px solid #bbf7d0;
+      border-radius: 9px; padding: 10px 14px;
+      margin-bottom: 18px; gap: 10px;
+    }
+    .demo-banner__text {
+      font-size: 0.78rem; color: var(--success); font-weight: 500;
+    }
+    .demo-banner__fill {
+      background: var(--white); border: 1px solid #86efac;
+      color: var(--success); font-size: 0.78rem; font-weight: 700;
+      padding: 4px 12px; border-radius: 6px;
+      cursor: pointer; white-space: nowrap;
+      letter-spacing: 0.1em;
+      font-family: monospace;
+      transition: background 0.15s;
+    }
+    .demo-banner__fill:hover { background: #dcfce7; }
+
     .otp-boxes {
-      display: flex; gap: 10px;
-      justify-content: center;
-      margin: 8px 0 24px;
+      display: flex; gap: 10px; justify-content: center;
+      margin-bottom: 20px;
     }
     .otp-box {
-      width: 58px; height: 64px;
-      text-align: center;
-      font-size: 1.6rem; font-weight: 700;
+      width: 60px; height: 68px;
+      text-align: center; font-size: 1.75rem; font-weight: 700;
       font-family: var(--sans);
       border: 2px solid var(--border);
-      border-radius: var(--radius-sm);
+      border-radius: 12px;
       background: var(--surface); color: var(--ink);
-      outline: none; transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
       caret-color: transparent;
     }
     .otp-box:focus {
@@ -128,42 +151,23 @@
       box-shadow: 0 0 0 3px var(--accent-dim);
       background: var(--white);
     }
-    .otp-box.filled  {
+    .otp-box.filled {
       border-color: var(--ink);
       background: var(--white);
-      transform: scale(1.03);
+      transform: scale(1.04);
     }
-    .otp-box.shake {
-      animation: shake 0.4s ease;
-    }
+    .otp-box.error-shake { animation: shake 0.4s ease; }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
-      20%      { transform: translateX(-4px); }
-      40%      { transform: translateX(4px); }
-      60%      { transform: translateX(-4px); }
-      80%      { transform: translateX(2px); }
+      20%     { transform: translateX(-5px); }
+      40%     { transform: translateX(5px); }
+      60%     { transform: translateX(-4px); }
+      80%     { transform: translateX(3px); }
     }
-
-    .demo-hint {
-      text-align: center; font-size: 0.75rem;
-      background: #f0fdf4; border: 1px solid #bbf7d0;
-      border-radius: var(--radius-sm); padding: 9px 14px;
-      color: var(--success); font-weight: 500;
-      margin-bottom: 16px;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .demo-hint__code {
-      background: var(--white); border: 1px solid #bbf7d0;
-      border-radius: 6px; padding: 2px 10px;
-      font-size: 0.9rem; letter-spacing: 0.12em;
-      font-weight: 700; color: var(--success);
-      cursor: pointer; user-select: all;
-    }
-    .demo-hint__code:hover { background: #dcfce7; }
 
     .resend-row {
       text-align: center; font-size: 0.8rem;
-      color: var(--ink-faint); margin-top: 14px;
+      color: var(--ink-faint); margin-top: 12px;
     }
     .resend-btn {
       background: none; border: none;
@@ -173,75 +177,22 @@
     }
     .resend-btn:disabled { color: var(--ink-faint); text-decoration: none; cursor: default; }
 
-    .back-btn {
-      display: block; margin: 14px auto 0;
+    .change-num-btn {
+      display: block; margin: 12px auto 0;
       background: none; border: none;
       font-size: 0.8rem; color: var(--ink-faint);
       cursor: pointer; font-family: var(--sans);
-      text-decoration: underline;
     }
-    .back-btn:hover { color: var(--ink-soft); }
+    .change-num-btn:hover { color: var(--ink-soft); text-decoration: underline; }
 
-    /* ── Done ── */
-    .done-icon {
-      width: 60px; height: 60px;
-      background: #f0fdf4; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.9rem; margin: 0 auto 16px;
-      animation: pop-in 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    /* ── Verify spinner ── */
+    .verify-loader {
+      display: none; align-items: center; justify-content: center;
+      gap: 10px; font-size: 0.875rem; color: var(--ink-soft);
+      padding: 12px 0;
     }
-    @keyframes pop-in {
-      from { transform: scale(0.5); opacity: 0; }
-      to   { transform: scale(1);   opacity: 1; }
-    }
-    .done-title {
-      font-family: var(--serif);
-      font-size: 1.6rem; text-align: center;
-      color: var(--ink); margin-bottom: 6px;
-    }
-    .done-sub {
-      text-align: center; font-size: 0.875rem;
-      color: var(--ink-soft); margin-bottom: 24px;
-    }
-    .done-actions { display: flex; flex-direction: column; gap: 10px; }
-
-    /* ── Admin badge on done panel ── */
-    .done-admin-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 0.75rem; font-weight: 600;
-      color: var(--accent); background: var(--accent-dim);
-      padding: 4px 12px; border-radius: 99px;
-      margin: 0 auto 16px; width: fit-content;
-    }
-
-    /* ── Error ── */
-    .error-msg {
-      font-size: 0.8rem; color: #b91c1c;
-      background: #fef2f2; border: 1px solid #fecaca;
-      border-radius: var(--radius-sm);
-      padding: 9px 12px; margin-top: 8px;
-      display: none; align-items: center; gap: 8px;
-    }
-    .error-msg.visible { display: flex; }
-
-    /* ── Admin panel warning ── */
-    .admin-notice {
-      background: #fffbeb; border: 1px solid #fde68a;
-      border-radius: var(--radius-sm);
-      padding: 10px 14px; font-size: 0.8rem;
-      color: var(--warn); margin-bottom: 16px;
-      display: none;
-    }
-    .admin-notice.visible { display: block; }
-
-    /* ── Verification loading ── */
-    .verify-spinner {
-      display: none; align-items: center; justify-content: center; gap: 10px;
-      font-size: 0.875rem; color: var(--ink-soft);
-      padding: 14px 0;
-    }
-    .verify-spinner.visible { display: flex; }
-    .spinner-ring {
+    .verify-loader.visible { display: flex; }
+    .spin-ring {
       width: 20px; height: 20px;
       border: 2px solid var(--border);
       border-top-color: var(--accent);
@@ -249,6 +200,63 @@
       animation: spin 0.7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error ── */
+    .field-error {
+      font-size: 0.8rem; color: #b91c1c;
+      background: #fef2f2; border: 1px solid #fecaca;
+      border-radius: 8px; padding: 9px 13px;
+      margin-top: 10px; display: none;
+    }
+    .field-error.visible { display: block; }
+
+    /* ── Done panel ── */
+    .done-wrap { text-align: center; }
+    .done-check {
+      font-size: 2.5rem; margin-bottom: 12px;
+      animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes pop { from { transform:scale(0.3); opacity:0; } to { transform:scale(1); opacity:1; } }
+    .done-title {
+      font-family: var(--serif);
+      font-size: 1.6rem; color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .done-sub {
+      font-size: 0.875rem; color: var(--ink-soft);
+      margin-bottom: 24px; line-height: 1.6;
+    }
+    .done-actions { display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── Admin notice ── */
+    .admin-notice {
+      background: #fffbeb; border: 1px solid #fde68a;
+      border-radius: 9px; padding: 10px 14px;
+      font-size: 0.8rem; color: var(--warn);
+      margin-bottom: 18px; display: none;
+    }
+    .admin-notice.visible { display: block; }
+
+    /* ── Below card links ── */
+    .below-card {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--ink-faint);
+      margin-top: 16px;
+    }
+    .below-card a {
+      color: var(--accent); text-decoration: none; font-weight: 500;
+    }
+    .below-card a:hover { text-decoration: underline; }
+
+    /* ── WS dot ── */
+    .ws-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--ink-faint);
+      display: inline-block; margin-left: 6px;
+      vertical-align: middle;
+      transition: background 0.3s;
+    }
   </style>
 </head>
 <body>
@@ -264,23 +272,26 @@
   </div>
 </nav>
 
-<main class="page fade-in">
-  <div class="otp-wrap">
-    <div class="otp-eyebrow">🔒 Secure login</div>
-    <h1 class="otp-title" id="page-title">Welcome back.</h1>
-    <p class="otp-sub" id="page-sub">
-      New here? <a onclick="location.href='register.html'">Create your account →</a>
-    </p>
+<div class="login-page">
+  <div class="login-box">
 
-    <!-- Mode toggle: Worker / Admin -->
-    <div class="mode-toggle" id="mode-toggle">
-      <button class="mode-btn mode-btn--active" id="mode-worker" onclick="setMode('worker')">👷 Worker login</button>
-      <button class="mode-btn" id="mode-admin"  onclick="setMode('admin')">⚙️ Admin login</button>
+    <div class="login-brand">
+      <a class="login-brand__logo" href="../index.html">Zepto<span>Shield</span></a>
+      <div class="login-brand__sub">
+        Parametric disaster insurance for gig workers
+        <span class="ws-dot" id="ws-dot" title="Connecting…"></span>
+      </div>
     </div>
 
-    <div class="otp-card">
+    <!-- Mode toggle -->
+    <div class="mode-toggle" id="mode-toggle">
+      <button class="mode-btn mode-btn--active" id="btn-worker" onclick="setMode('worker')">👷 Worker</button>
+      <button class="mode-btn" id="btn-admin" onclick="setMode('admin')">⚙️ Admin</button>
+    </div>
 
-      <!-- Steps -->
+    <div class="login-card">
+
+      <!-- Step indicators -->
       <div class="steps">
         <div class="step">
           <div class="step__dot step__dot--active" id="dot-1">1</div>
@@ -289,207 +300,173 @@
         <div class="step__line" id="line-1"></div>
         <div class="step">
           <div class="step__dot step__dot--pending" id="dot-2">2</div>
-          <span class="step__label">OTP</span>
+          <span class="step__label">Verify</span>
         </div>
         <div class="step__line" id="line-2"></div>
         <div class="step">
           <div class="step__dot step__dot--pending" id="dot-3">✓</div>
-          <span class="step__label">Done</span>
+          <span class="step__label">Access</span>
         </div>
       </div>
 
       <!-- Admin notice -->
       <div class="admin-notice" id="admin-notice">
-        ⚙️ Entering admin mode — use the platform admin phone number.
-        Demo OTP is still <strong>1234</strong>.
+        ⚙️ Admin mode — only pre-authorised phones can access the dashboard.
       </div>
 
       <!-- Panel 1: Phone -->
       <div id="panel-phone">
         <div class="form-group">
-          <label class="form-label" for="login-phone">Mobile number</label>
-          <div class="phone-input-wrap">
-            <span class="phone-prefix">+91</span>
-            <input
-              class="form-input"
-              id="login-phone"
-              type="tel"
-              placeholder="9876543210"
-              maxlength="10"
-              inputmode="numeric"
-            />
+          <label class="form-label" for="inp-phone">Mobile number</label>
+          <div class="input-with-prefix">
+            <span class="input-prefix">+91</span>
+            <input class="form-input" id="inp-phone" type="tel"
+              placeholder="9876543210" maxlength="10" inputmode="numeric"
+              autocomplete="tel-national" />
           </div>
         </div>
-        <div class="error-msg" id="phone-error">⚠ <span id="phone-error-text"></span></div>
-        <button class="btn btn--primary btn--full" id="send-otp-btn" style="margin-top:16px;">
-          Send OTP
+        <div class="field-error" id="phone-err"></div>
+        <button class="btn btn--primary btn--full" id="btn-send" style="margin-top:16px;">
+          Send OTP →
         </button>
       </div>
 
       <!-- Panel 2: OTP -->
-      <div id="panel-otp">
-        <p style="font-size:0.875rem; color:var(--ink-soft); margin-bottom:16px; text-align:center;">
-          Enter the 4-digit code sent to <strong id="otp-phone-display"></strong>
+      <div id="panel-otp" style="display:none;">
+        <p class="otp-target-text">
+          Code sent to <strong id="otp-phone-label"></strong>
         </p>
 
-        <div class="demo-hint">
-          🧪 Demo — tap to auto-fill:
-          <span class="demo-hint__code" id="demo-code-btn" onclick="autofillOtp()">1234</span>
+        <!-- Demo hint — only shown when server is in demo mode -->
+        <div class="demo-banner" id="demo-banner" style="display:none;">
+          <span class="demo-banner__text">🧪 Demo mode — tap to fill:</span>
+          <button class="demo-banner__fill" onclick="autofillOtp()">1 2 3 4</button>
         </div>
 
         <div class="otp-boxes">
-          <input class="otp-box" id="otp-0" type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code" />
-          <input class="otp-box" id="otp-1" type="text" maxlength="1" inputmode="numeric" />
-          <input class="otp-box" id="otp-2" type="text" maxlength="1" inputmode="numeric" />
-          <input class="otp-box" id="otp-3" type="text" maxlength="1" inputmode="numeric" />
+          <input class="otp-box" id="b0" type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code" />
+          <input class="otp-box" id="b1" type="text" maxlength="1" inputmode="numeric" />
+          <input class="otp-box" id="b2" type="text" maxlength="1" inputmode="numeric" />
+          <input class="otp-box" id="b3" type="text" maxlength="1" inputmode="numeric" />
         </div>
 
-        <!-- Verifying spinner -->
-        <div class="verify-spinner" id="verify-spinner">
-          <div class="spinner-ring"></div>
-          Verifying…
+        <div class="verify-loader" id="verify-loader">
+          <div class="spin-ring"></div> Verifying…
         </div>
 
-        <div class="error-msg" id="otp-error">⚠ <span id="otp-error-text"></span></div>
+        <div class="field-error" id="otp-err"></div>
 
-        <button class="btn btn--primary btn--full" id="verify-otp-btn">
-          Verify OTP
-        </button>
+        <button class="btn btn--primary btn--full" id="btn-verify">Verify OTP</button>
 
-        <div class="resend-row" style="margin-top:16px;">
+        <div class="resend-row" style="margin-top:14px;">
           Didn't get it?
-          <button class="resend-btn" id="resend-btn" disabled>
-            Resend in <span id="resend-timer">30</span>s
+          <button class="resend-btn" id="btn-resend" disabled>
+            Resend in <span id="resend-count">30</span>s
           </button>
         </div>
-
-        <button class="back-btn" onclick="showPanel('phone')">← Change number</button>
+        <button class="change-num-btn" onclick="showPanel('phone')">← Change number</button>
       </div>
 
       <!-- Panel 3: Done -->
-      <div id="panel-done">
-        <div class="done-icon">✅</div>
-        <div class="done-admin-badge" id="done-admin-badge" style="display:none;">⚙️ Admin access granted</div>
-        <div class="done-title">Verified!</div>
-        <p class="done-sub" id="done-msg">Redirecting…</p>
-        <div class="done-actions">
-          <button class="btn btn--primary btn--full" id="goto-primary-btn">
-            Continue →
-          </button>
-          <button class="btn btn--ghost btn--full" id="goto-secondary-btn" style="display:none;">
-            Create account →
-          </button>
+      <div id="panel-done" style="display:none;">
+        <div class="done-wrap">
+          <div class="done-check" id="done-icon">✅</div>
+          <div class="done-title">You're in!</div>
+          <p class="done-sub" id="done-sub">Redirecting…</p>
+          <div class="done-actions">
+            <button class="btn btn--primary btn--full" id="btn-continue">Continue →</button>
+            <button class="btn btn--ghost btn--full" id="btn-secondary" style="display:none;">Create account →</button>
+          </div>
         </div>
       </div>
 
-    </div><!-- /otp-card -->
+    </div><!-- /login-card -->
 
-    <!-- Info below card -->
-    <p style="text-align:center; font-size:0.75rem; color:var(--ink-faint); margin-top:20px;">
-      🔒 Your number is never stored in plain text · OTP expires in 5 min
-    </p>
+    <div class="below-card" id="below-card">
+      New worker? <a href="register.html">Create your account →</a>
+    </div>
 
   </div>
-</main>
+</div>
 
-<footer class="footer">
-  <div class="footer__inner">
-    <div class="footer__logo">Zepto<span>Shield</span></div>
-    <div class="footer__copy">© 2026 ZeptoShield</div>
-  </div>
-</footer>
-
-<script src="../js/api.js"></script>
+<script src="../js/realtime.js"></script>
 <script>
-const API = window.API_BASE || "http://localhost:5000";
+const API = "http://localhost:5000";
 
 let currentPhone = "";
-let currentMode  = "worker"; // "worker" | "admin"
-let resendInterval = null;
+let currentMode  = "worker";
+let resendTimer  = null;
+let isDemoMode   = false; // will be set after first OTP request response
 
-// ── Mode switching ────────────────────────────────────────────────────────────
+// ── Attach live dot ────────────────────────────────────────────────────────
+attachConnectionIndicator("ws-dot");
+
+// ── Session guard: already logged in? ─────────────────────────────────────
+(async function checkSession() {
+  if (!ZS_AUTH.isLoggedIn()) return;
+  const { ok, data } = await apiFetch("GET", "/api/auth/me") || {};
+  if (ok) {
+    ZS_AUTH.save({ isAdmin: data.isAdmin, worker: data.worker });
+    goToDest(data.isAdmin, data.workerExists || !!data.worker, ZS_AUTH.getPhone());
+  } else {
+    ZS_AUTH.clear();
+  }
+})();
+
+// ── Mode switching ─────────────────────────────────────────────────────────
 function setMode(mode) {
   currentMode = mode;
-  document.getElementById("mode-worker").classList.toggle("mode-btn--active", mode === "worker");
-  document.getElementById("mode-admin").classList.toggle("mode-btn--active",  mode === "admin");
-
-  const adminNotice = document.getElementById("admin-notice");
-  if (mode === "admin") {
-    adminNotice.classList.add("visible");
-    document.getElementById("page-title").textContent = "Admin login.";
-    document.getElementById("page-sub").innerHTML = "Worker? <a onclick=\"setMode('worker')\">Switch to worker login →</a>";
-  } else {
-    adminNotice.classList.remove("visible");
-    document.getElementById("page-title").textContent = "Welcome back.";
-    document.getElementById("page-sub").innerHTML = "New here? <a onclick=\"location.href='register.html'\">Create your account →</a>";
-  }
+  document.getElementById("btn-worker").classList.toggle("mode-btn--active", mode === "worker");
+  document.getElementById("btn-admin").classList.toggle("mode-btn--active",  mode === "admin");
+  document.getElementById("admin-notice").classList.toggle("visible", mode === "admin");
+  document.getElementById("below-card").style.display = mode === "worker" ? "block" : "none";
 }
 
-// ── Panel helpers ─────────────────────────────────────────────────────────────
-function showPanel(name) {
-  document.getElementById("panel-phone").style.display = name === "phone" ? "block" : "none";
-  document.getElementById("panel-otp").style.display   = name === "otp"   ? "block" : "none";
-  document.getElementById("panel-done").style.display  = name === "done"  ? "block" : "none";
-
-  if (name === "phone") {
-    setDot(1,"active"); setDot(2,"pending"); setDot(3,"pending");
-    setLine(1,false); setLine(2,false);
-    document.getElementById("mode-toggle").style.display = "flex";
-  } else if (name === "otp") {
-    setDot(1,"done"); setDot(2,"active"); setDot(3,"pending");
-    setLine(1,true); setLine(2,false);
-    document.getElementById("mode-toggle").style.display = "none";
-    setTimeout(() => document.getElementById("otp-0").focus(), 50);
-  } else if (name === "done") {
-    setDot(1,"done"); setDot(2,"done"); setDot(3,"done");
-    setLine(1,true); setLine(2,true);
-    document.getElementById("mode-toggle").style.display = "none";
-  }
-}
-
+// ── Step indicators ────────────────────────────────────────────────────────
 function setDot(n, state) {
   const dot = document.getElementById(`dot-${n}`);
   dot.className = `step__dot step__dot--${state}`;
-  dot.textContent = state === "done" ? "✓" : n;
+  dot.textContent = state === "done" ? "✓" : String(n);
 }
 function setLine(n, done) {
-  const line = document.getElementById(`line-${n}`);
-  line.className = "step__line" + (done ? " step__line--done" : "");
+  document.getElementById(`line-${n}`).className = `step__line${done ? " step__line--done" : ""}`;
 }
 
-function showError(panel, msg) {
-  const errEl  = document.getElementById(`${panel}-error`);
-  const textEl = document.getElementById(`${panel}-error-text`);
-  textEl.textContent = msg;
-  errEl.classList.add("visible");
-}
-function clearError(panel) {
-  document.getElementById(`${panel}-error`).classList.remove("visible");
+function showPanel(name) {
+  ["phone","otp","done"].forEach(p =>
+    document.getElementById(`panel-${p}`).style.display = p === name ? "block" : "none"
+  );
+  document.getElementById("mode-toggle").style.display = name === "phone" ? "flex" : "none";
+
+  if (name === "phone")  { setDot(1,"active"); setDot(2,"pending"); setDot(3,"pending"); setLine(1,false); setLine(2,false); }
+  if (name === "otp")    { setDot(1,"done"); setDot(2,"active"); setDot(3,"pending"); setLine(1,true); setLine(2,false); setTimeout(() => boxes[0].focus(), 60); }
+  if (name === "done")   { setDot(1,"done"); setDot(2,"done"); setDot(3,"done"); setLine(1,true); setLine(2,true); }
 }
 
-// ── Auto-fill OTP for demo ────────────────────────────────────────────────────
-function autofillOtp() {
-  const digits = "1234".split("");
-  otpBoxes.forEach((box, i) => {
-    box.value = digits[i];
-    box.classList.add("filled");
-  });
-  setTimeout(() => document.getElementById("verify-otp-btn").click(), 300);
+// ── Error helpers ──────────────────────────────────────────────────────────
+function showErr(panel, msg) {
+  const el = document.getElementById(`${panel}-err`);
+  el.textContent = msg; el.classList.add("visible");
+}
+function clearErr(panel) {
+  document.getElementById(`${panel}-err`).classList.remove("visible");
 }
 
-// ── Send OTP ──────────────────────────────────────────────────────────────────
-document.getElementById("send-otp-btn").addEventListener("click", async () => {
-  const phone = document.getElementById("login-phone").value.trim();
-  clearError("phone");
+// ── Send OTP ───────────────────────────────────────────────────────────────
+document.getElementById("btn-send").addEventListener("click", sendOtp);
+document.getElementById("inp-phone").addEventListener("keydown", e => { if (e.key === "Enter") sendOtp(); });
+
+async function sendOtp() {
+  const phone = document.getElementById("inp-phone").value.trim();
+  clearErr("phone");
 
   if (!/^\d{10}$/.test(phone)) {
-    showError("phone", "Please enter a valid 10-digit mobile number.");
+    showErr("phone", "Please enter a valid 10-digit mobile number.");
     return;
   }
 
-  const btn = document.getElementById("send-otp-btn");
-  btn.textContent = "Sending…";
-  btn.disabled = true;
+  const btn = document.getElementById("btn-send");
+  btn.textContent = "Sending…"; btn.disabled = true;
 
   try {
     const res = await fetch(`${API}/api/auth/send-otp`, {
@@ -498,90 +475,81 @@ document.getElementById("send-otp-btn").addEventListener("click", async () => {
       body: JSON.stringify({ phone }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to send OTP");
+
+    if (!res.ok) {
+      showErr("phone", data.error || "Failed to send OTP");
+      return;
+    }
 
     currentPhone = phone;
-    document.getElementById("otp-phone-display").textContent = `+91 ${phone}`;
+    isDemoMode   = !!data.demo;
+
+    document.getElementById("otp-phone-label").textContent = `+91 ${phone}`;
+    document.getElementById("demo-banner").style.display = data.demo ? "flex" : "none";
+
     showPanel("otp");
-    startResendTimer();
-  } catch (err) {
-    showError("phone", err.message);
+    startResend();
+
+  } catch {
+    showErr("phone", "Network error — is the server running?");
   } finally {
-    btn.textContent = "Send OTP";
-    btn.disabled = false;
+    btn.textContent = "Send OTP →"; btn.disabled = false;
   }
-});
+}
 
-// ── OTP box UX: advance, backspace, paste ─────────────────────────────────────
-const otpBoxes = [0,1,2,3].map(i => document.getElementById(`otp-${i}`));
+// ── OTP boxes ──────────────────────────────────────────────────────────────
+const boxes = [0,1,2,3].map(i => document.getElementById(`b${i}`));
 
-otpBoxes.forEach((box, i) => {
+boxes.forEach((box, i) => {
   box.addEventListener("input", e => {
-    const val = e.target.value.replace(/\D/g,"");
-    e.target.value = val;
-    if (val) {
-      box.classList.add("filled");
-      if (i < 3) otpBoxes[i+1].focus();
-      else autoVerify();
-    } else {
-      box.classList.remove("filled");
-    }
+    const v = e.target.value.replace(/\D/g,"");
+    e.target.value = v;
+    box.classList.toggle("filled", !!v);
+    if (v && i < 3) boxes[i+1].focus();
+    if (v && i === 3) tryAutoVerify();
   });
 
   box.addEventListener("keydown", e => {
     if (e.key === "Backspace" && !box.value && i > 0) {
-      otpBoxes[i-1].value = "";
-      otpBoxes[i-1].classList.remove("filled");
-      otpBoxes[i-1].focus();
+      boxes[i-1].value = "";
+      boxes[i-1].classList.remove("filled");
+      boxes[i-1].focus();
     }
   });
 
   box.addEventListener("paste", e => {
     e.preventDefault();
-    const text = (e.clipboardData || window.clipboardData).getData("text").replace(/\D/g,"");
-    text.split("").slice(0,4).forEach((ch, j) => {
-      if (otpBoxes[j]) { otpBoxes[j].value = ch; otpBoxes[j].classList.add("filled"); }
+    const digits = (e.clipboardData || window.clipboardData)
+      .getData("text").replace(/\D/g,"").slice(0,4);
+    digits.split("").forEach((d,j) => {
+      if (boxes[j]) { boxes[j].value = d; boxes[j].classList.add("filled"); }
     });
-    if (text.length >= 4) autoVerify();
-    else if (text.length > 0) otpBoxes[Math.min(text.length,3)].focus();
-  });
-
-  // Tap to re-enter a box
-  box.addEventListener("click", () => {
-    box.select();
+    if (digits.length >= 4) tryAutoVerify();
+    else boxes[Math.min(digits.length, 3)].focus();
   });
 });
 
-function getOTPValue() { return otpBoxes.map(b => b.value).join(""); }
+function getOtp() { return boxes.map(b => b.value).join(""); }
+function tryAutoVerify() { if (getOtp().length === 4) setTimeout(() => document.getElementById("btn-verify").click(), 250); }
 
-function autoVerify() {
-  if (getOTPValue().length === 4) {
-    setTimeout(() => document.getElementById("verify-otp-btn").click(), 250);
-  }
+function autofillOtp() {
+  "1234".split("").forEach((d,i) => { boxes[i].value = d; boxes[i].classList.add("filled"); });
+  setTimeout(() => document.getElementById("btn-verify").click(), 300);
 }
 
-function shakeBoxes() {
-  otpBoxes.forEach(b => {
-    b.classList.remove("shake");
-    void b.offsetWidth; // reflow
-    b.classList.add("shake");
-  });
-}
+// ── Verify OTP ─────────────────────────────────────────────────────────────
+document.getElementById("btn-verify").addEventListener("click", verifyOtp);
 
-// ── Verify OTP ────────────────────────────────────────────────────────────────
-document.getElementById("verify-otp-btn").addEventListener("click", async () => {
-  const otp = getOTPValue();
-  clearError("otp");
+async function verifyOtp() {
+  const otp = getOtp();
+  clearErr("otp");
 
-  if (otp.length !== 4) {
-    showError("otp", "Please enter the 4-digit OTP.");
-    return;
-  }
+  if (otp.length !== 4) { showErr("otp", "Please enter the 4-digit code."); return; }
 
-  const btn     = document.getElementById("verify-otp-btn");
-  const spinner = document.getElementById("verify-spinner");
+  const btn    = document.getElementById("btn-verify");
+  const loader = document.getElementById("verify-loader");
   btn.style.display    = "none";
-  spinner.classList.add("visible");
+  loader.classList.add("visible");
 
   try {
     const res = await fetch(`${API}/api/auth/verify-otp`, {
@@ -590,122 +558,114 @@ document.getElementById("verify-otp-btn").addEventListener("click", async () => 
       body: JSON.stringify({ phone: currentPhone, otp }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "OTP verification failed");
 
-    // Save session
-    sessionStorage.setItem("zs_phone", currentPhone);
-    sessionStorage.setItem("zs_mode",  currentMode);
-    if (data.worker) sessionStorage.setItem("zs_worker", JSON.stringify(data.worker));
-    if (currentMode === "admin") sessionStorage.setItem("zs_admin", "true");
-
-    // Show done panel
-    showPanel("done");
-    if (resendInterval) clearInterval(resendInterval);
-
-    if (currentMode === "admin") {
-      document.getElementById("done-admin-badge").style.display = "flex";
-      document.getElementById("done-msg").textContent = "Redirecting to admin dashboard…";
-      document.getElementById("goto-primary-btn").textContent   = "Go to admin dashboard →";
-      document.getElementById("goto-primary-btn").onclick = () => location.href = "admin.html";
-      document.getElementById("goto-secondary-btn").style.display = "none";
-      setTimeout(() => location.href = "admin.html", 1800);
-    } else if (data.workerExists) {
-      document.getElementById("done-admin-badge").style.display = "none";
-      document.getElementById("done-msg").textContent = "Redirecting to your dashboard…";
-      document.getElementById("goto-primary-btn").textContent   = "Go to dashboard →";
-      document.getElementById("goto-primary-btn").onclick = () => location.href = `dashboard.html?phone=${currentPhone}`;
-      document.getElementById("goto-secondary-btn").style.display = "none";
-      setTimeout(() => location.href = `dashboard.html?phone=${currentPhone}`, 1800);
-    } else {
-      document.getElementById("done-admin-badge").style.display = "none";
-      document.getElementById("done-msg").textContent = "Phone verified! Let's set up your account.";
-      document.getElementById("goto-primary-btn").style.display   = "none";
-      document.getElementById("goto-secondary-btn").style.display = "block";
-      document.getElementById("goto-secondary-btn").onclick = () => location.href = `register.html?phone=${currentPhone}`;
-      setTimeout(() => location.href = `register.html?phone=${currentPhone}`, 1800);
+    if (!res.ok) {
+      showErr("otp", data.error || "Invalid OTP");
+      shakeBoxes();
+      boxes.forEach(b => { b.value = ""; b.classList.remove("filled"); });
+      boxes[0].focus();
+      return;
     }
 
-  } catch (err) {
-    showError("otp", err.message);
-    shakeBoxes();
-    otpBoxes.forEach(b => { b.value = ""; b.classList.remove("filled"); });
-    otpBoxes[0].focus();
+    // Save session
+    ZS_AUTH.save({
+      token:   data.token,
+      phone:   currentPhone,
+      isAdmin: data.isAdmin || currentMode === "admin",
+      worker:  data.worker,
+    });
+
+    clearTimeout(resendTimer);
+    showPanel("done");
+
+    // Set done panel content
+    goToDest(data.isAdmin || currentMode === "admin", data.workerExists, currentPhone);
+
+  } catch {
+    showErr("otp", "Network error — please try again.");
   } finally {
-    spinner.classList.remove("visible");
+    loader.classList.remove("visible");
     btn.style.display = "block";
     btn.disabled = false;
   }
-});
+}
 
-// ── Resend timer ──────────────────────────────────────────────────────────────
-function startResendTimer() {
-  let remaining = 30;
-  const resendBtn   = document.getElementById("resend-btn");
-  const resendTimer = document.getElementById("resend-timer");
-  resendBtn.disabled = true;
-  resendBtn.innerHTML = `Resend in <span id="resend-timer">${remaining}s</span>`;
+function goToDest(isAdmin, workerExists, phone) {
+  const sub  = document.getElementById("done-sub");
+  const btnP = document.getElementById("btn-continue");
+  const btnS = document.getElementById("btn-secondary");
 
-  if (resendInterval) clearInterval(resendInterval);
-  resendInterval = setInterval(() => {
-    remaining--;
-    const el = document.getElementById("resend-timer");
-    if (el) el.textContent = `${remaining}s`;
-    if (remaining <= 0) {
-      clearInterval(resendInterval);
-      resendBtn.disabled  = false;
-      resendBtn.innerHTML = "Resend OTP";
+  // Check URL ?next= param first
+  const next = new URLSearchParams(location.search).get("next");
+
+  if (isAdmin) {
+    sub.textContent = "Redirecting to admin dashboard…";
+    btnP.textContent = "Open admin dashboard →";
+    btnP.onclick = () => location.href = "admin.html";
+    btnS.style.display = "none";
+    setTimeout(() => location.href = next || "admin.html", 1500);
+  } else if (workerExists) {
+    sub.textContent = "Redirecting to your dashboard…";
+    btnP.textContent = "Go to dashboard →";
+    btnP.onclick = () => location.href = next || `dashboard.html?phone=${phone}`;
+    btnS.style.display = "none";
+    setTimeout(() => location.href = next || `dashboard.html?phone=${phone}`, 1500);
+  } else {
+    sub.textContent = "Phone verified! Let's complete your profile.";
+    btnP.style.display = "none";
+    btnS.style.display = "block";
+    btnS.textContent   = "Create your account →";
+    btnS.onclick = () => location.href = `register.html?phone=${phone}`;
+    setTimeout(() => location.href = `register.html?phone=${phone}`, 1500);
+  }
+}
+
+// ── Resend timer ───────────────────────────────────────────────────────────
+function startResend() {
+  let t = 30;
+  const btn = document.getElementById("btn-resend");
+  const cnt = document.getElementById("resend-count");
+  btn.disabled = true;
+  cnt.textContent = t;
+
+  clearInterval(resendTimer);
+  resendTimer = setInterval(() => {
+    t--;
+    cnt.textContent = t;
+    if (t <= 0) {
+      clearInterval(resendTimer);
+      btn.disabled  = false;
+      btn.innerHTML = "Resend OTP";
     }
   }, 1000);
 }
 
-document.getElementById("resend-btn").addEventListener("click", async () => {
+document.getElementById("btn-resend").addEventListener("click", async () => {
   if (!currentPhone) return;
   try {
     await fetch(`${API}/api/auth/send-otp`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ phone: currentPhone }),
     });
   } catch {}
-  startResendTimer();
-  otpBoxes.forEach(b => { b.value = ""; b.classList.remove("filled"); });
-  otpBoxes[0].focus();
+  startResend();
+  boxes.forEach(b => { b.value = ""; b.classList.remove("filled"); });
+  boxes[0].focus();
 });
 
-// ── Enter key on phone ────────────────────────────────────────────────────────
-document.getElementById("login-phone").addEventListener("keydown", e => {
-  if (e.key === "Enter") document.getElementById("send-otp-btn").click();
-});
-
-// ── Pre-fill from URL ─────────────────────────────────────────────────────────
-const urlParams = new URLSearchParams(window.location.search);
-const prePhone  = urlParams.get("phone");
-const preMode   = urlParams.get("mode");
-if (prePhone) document.getElementById("login-phone").value = prePhone;
-if (preMode === "admin") setMode("admin");
-
-// ── Session guard: already logged in? ────────────────────────────────────────
-const existingPhone = sessionStorage.getItem("zs_phone");
-const isAdmin       = sessionStorage.getItem("zs_admin") === "true";
-if (existingPhone) {
-  // Already verified this session — skip to done
-  currentPhone = existingPhone;
-  currentMode  = isAdmin ? "admin" : "worker";
-  setMode(currentMode);
-  const worker = sessionStorage.getItem("zs_worker");
-  if (isAdmin) {
-    showPanel("done");
-    document.getElementById("done-admin-badge").style.display = "flex";
-    document.getElementById("done-msg").textContent = "You are logged in as admin.";
-    document.getElementById("goto-primary-btn").textContent = "Go to admin dashboard →";
-    document.getElementById("goto-primary-btn").onclick = () => location.href = "admin.html";
-  } else if (worker) {
-    showPanel("done");
-    document.getElementById("done-msg").textContent = `You're logged in as ${JSON.parse(worker).name}.`;
-    document.getElementById("goto-primary-btn").textContent = "Go to dashboard →";
-    document.getElementById("goto-primary-btn").onclick = () => location.href = `dashboard.html?phone=${existingPhone}`;
-  }
+// ── Shake animation ─────────────────────────────────────────────────────────
+function shakeBoxes() {
+  boxes.forEach(b => {
+    b.classList.remove("error-shake");
+    void b.offsetWidth;
+    b.classList.add("error-shake");
+  });
 }
+
+// ── Pre-fill from URL ──────────────────────────────────────────────────────
+const urlP = new URLSearchParams(location.search);
+if (urlP.get("phone")) document.getElementById("inp-phone").value = urlP.get("phone");
+if (urlP.get("mode") === "admin") setMode("admin");
 </script>
 </body>
 </html>
