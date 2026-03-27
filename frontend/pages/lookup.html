@@ -4,7 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Policy — ZeptoShield</title>
-  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/theme.css" />
+  <style>
+    .lookup-result {
+      padding-top: 24px; border-top: 1px solid var(--border); margin-top: 24px;
+      animation: fadein 0.3s ease;
+    }
+    @keyframes fadein { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+    .lookup-result__name { font-family: var(--serif); font-size: 1.6rem; color: var(--ink); margin-bottom: 4px; letter-spacing: -0.02em; }
+    .lookup-result__sub { font-size: 0.82rem; color: var(--ink-faint); margin-bottom: 20px; }
+    .lookup-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+    .lookup-field__label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--p600); margin-bottom: 4px; }
+    .lookup-field__val { font-size: 0.95rem; color: var(--ink); font-weight: 500; }
+
+    .lf-card {
+      background: var(--p50); border: 1px solid var(--p200); border-radius: var(--radius-sm); padding: 14px 16px;
+    }
+  </style>
 </head>
 <body>
 
@@ -21,16 +37,18 @@
 
 <main class="page fade-in">
   <div class="form-wrap">
-    <div class="hero__eyebrow" style="display:inline-flex; margin-bottom:16px;">My account</div>
+    <div class="eyebrow-pill">My account</div>
     <h1 class="form-page__title">Find your policy.</h1>
-    <p class="form-page__sub">
-      New here? <a onclick="location.href='register.html'">Register first →</a>
-    </p>
+    <p class="form-page__sub">New here? <a onclick="location.href='register.html'">Register first →</a></p>
 
     <div class="form-card">
       <div class="form-group">
         <label class="form-label" for="phone">Mobile number</label>
-        <input class="form-input" id="phone" type="tel" placeholder="9876543210" maxlength="10" inputmode="numeric" />
+        <div style="position:relative;">
+          <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:0.9rem;font-weight:500;pointer-events:none;z-index:2;">+91</span>
+          <div style="position:absolute;left:44px;top:50%;transform:translateY(-50%);height:18px;width:1px;background:var(--border);"></div>
+          <input class="form-input" id="phone" type="tel" placeholder="9876543210" maxlength="10" inputmode="numeric" style="padding-left:58px;" />
+        </div>
       </div>
       <button class="btn btn--primary btn--full" id="lookup-btn">Find my account →</button>
 
@@ -39,22 +57,10 @@
           <div class="lookup-result__name" id="r-name"></div>
           <div class="lookup-result__sub" id="r-sub"></div>
           <div class="lookup-grid">
-            <div>
-              <div class="lookup-field__label">Risk zone</div>
-              <div class="lookup-field__val" id="r-risk"></div>
-            </div>
-            <div>
-              <div class="lookup-field__label">Weekly premium</div>
-              <div class="lookup-field__val" id="r-prem"></div>
-            </div>
-            <div>
-              <div class="lookup-field__label">Policy status</div>
-              <div class="lookup-field__val" id="r-status"></div>
-            </div>
-            <div>
-              <div class="lookup-field__label">Total claims</div>
-              <div class="lookup-field__val" id="r-claims"></div>
-            </div>
+            <div class="lf-card"><div class="lookup-field__label">Risk zone</div><div class="lookup-field__val" id="r-risk"></div></div>
+            <div class="lf-card"><div class="lookup-field__label">Weekly premium</div><div class="lookup-field__val" id="r-prem"></div></div>
+            <div class="lf-card"><div class="lookup-field__label">Policy status</div><div class="lookup-field__val" id="r-status"></div></div>
+            <div class="lf-card"><div class="lookup-field__label">Total claims</div><div class="lookup-field__val" id="r-claims"></div></div>
           </div>
           <button class="btn btn--primary btn--full" id="go-dash-btn">Go to dashboard →</button>
         </div>
@@ -81,20 +87,15 @@
       Toast.show({ type: "error", title: "Invalid number", sub: "Enter your 10-digit mobile number." });
       return;
     }
-
     const btn = document.getElementById("lookup-btn");
     btn.disabled = true; btn.textContent = "Searching…";
-
     const data = await ZS.api("GET", `/workers/${phone}`);
-
     btn.disabled = false; btn.textContent = "Find my account →";
-
     if (data.error) {
       Toast.show({ type: "error", title: "Not found", sub: "No account found. Register first." });
       document.getElementById("result").style.display = "none";
       return;
     }
-
     foundPhone = phone;
     const { worker, policy, claims } = data;
     document.getElementById("r-name").textContent = worker.name;

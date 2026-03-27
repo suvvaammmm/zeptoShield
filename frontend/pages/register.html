@@ -4,108 +4,65 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Register — ZeptoShield</title>
-  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/theme.css" />
   <style>
-    .reg-wrap { max-width: 520px; margin: 0 auto; padding: 88px 24px 64px; }
-
-    .reg-eyebrow {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.06em; color: var(--accent);
-      background: var(--accent-dim); padding: 5px 12px;
-      border-radius: 99px; margin-bottom: 16px;
-    }
-    .reg-title {
-      font-family: var(--serif);
-      font-size: clamp(1.75rem, 5vw, 2.25rem);
-      color: var(--ink); letter-spacing: -0.02em;
-      line-height: 1.15; margin-bottom: 8px;
-    }
-    .reg-sub { font-size: 0.875rem; color: var(--ink-soft); margin-bottom: 32px; }
-
-    .reg-card {
-      background: var(--white); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 32px 28px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.04);
-    }
-
+    .reg-wrap { max-width: 540px; margin: 0 auto; padding: 96px 24px 80px; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
 
-    /* Premium preview card */
+    /* Premium preview */
     .premium-preview {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 18px 20px;
-      margin-top: 20px; display: none;
+      background: var(--p50); border: 1px solid var(--p200);
+      border-radius: var(--radius-sm); padding: 20px; margin-top: 20px; display: none;
       animation: fadein 0.3s ease;
     }
     .premium-preview.visible { display: block; }
-    @keyframes fadein { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
-
-    .premium-preview__label {
-      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.07em; color: var(--ink-faint); margin-bottom: 4px;
-    }
-    .premium-preview__price {
-      font-family: var(--serif); font-size: 2.25rem;
-      color: var(--ink); letter-spacing: -0.03em; line-height: 1;
-    }
+    @keyframes fadein { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+    .premium-preview__label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--p600); margin-bottom: 4px; }
+    .premium-preview__price { font-family: var(--serif); font-size: 2.4rem; color: var(--p800); letter-spacing: -0.03em; line-height: 1; }
     .premium-preview__price span { font-size: 1rem; color: var(--ink-soft); font-family: var(--sans); }
     .premium-preview__sub { font-size: 0.78rem; color: var(--ink-faint); margin-top: 6px; }
-    .premium-preview__breakdown {
-      margin-top: 14px; display: flex; flex-direction: column; gap: 6px;
-    }
+    .premium-preview__breakdown { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
     .risk-bar-row { display: flex; align-items: center; gap: 10px; }
-    .risk-bar-row__label { font-size: 0.73rem; color: var(--ink-soft); width: 110px; flex-shrink: 0; }
-    .risk-bar { flex: 1; height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
-    .risk-bar__fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width 0.5s ease; }
+    .risk-bar-row__label { font-size: 0.73rem; color: var(--ink-soft); width: 115px; flex-shrink: 0; }
+    .risk-bar { flex: 1; height: 5px; background: var(--p200); border-radius: 99px; overflow: hidden; }
+    .risk-bar__fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--p700), var(--p400)); transition: width 0.5s ease; }
     .risk-bar-row__pct { font-size: 0.72rem; color: var(--ink-faint); width: 30px; text-align: right; }
 
-    /* Risk tier badge */
-    .tier-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.05em; padding: 3px 10px; border-radius: 99px;
-    }
+    .tier-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 10px; border-radius: 99px; }
     .tier-badge--high   { background: #fef2f2; color: #b91c1c; }
-    .tier-badge--medium { background: #fffbeb; color: var(--warn); }
-    .tier-badge--low    { background: #f0fdf4; color: var(--success); }
+    .tier-badge--medium { background: #fef9c3; color: var(--warn); }
+    .tier-badge--low    { background: #d1fae5; color: var(--success); }
 
-    .field-error {
-      font-size: 0.8rem; color: #b91c1c;
-      background: #fef2f2; border: 1px solid #fecaca;
-      border-radius: 8px; padding: 9px 13px;
-      margin-top: 10px; display: none;
-    }
-    .field-error.visible { display: block; }
-
-    /* Success state */
-    .reg-success {
-      text-align: center; display: none; padding: 20px 0;
-    }
+    /* Success */
+    .reg-success { text-align: center; display: none; padding: 24px 0; }
     .reg-success.visible { display: block; }
-    .reg-success__icon { font-size: 2.5rem; margin-bottom: 12px; }
-    .reg-success__title {
-      font-family: var(--serif); font-size: 1.5rem;
-      color: var(--ink); margin-bottom: 8px;
+    .reg-success__icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--p700), var(--p400));
+      display: flex; align-items: center; justify-content: center; font-size: 2rem;
+      margin: 0 auto 16px;
+      animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 12px 32px rgba(109,40,217,0.3);
     }
-    .reg-success__sub { font-size: 0.875rem; color: var(--ink-soft); margin-bottom: 20px; }
+    @keyframes pop { from{transform:scale(0.2);opacity:0} to{transform:scale(1);opacity:1} }
+    .reg-success__title { font-family: var(--serif); font-size: 1.7rem; color: var(--ink); margin-bottom: 8px; }
+    .reg-success__sub { font-size: 0.875rem; color: var(--ink-soft); margin-bottom: 24px; line-height: 1.6; }
 
-    /* Live activity feed */
-    .live-feed {
-      position: fixed; bottom: 24px; left: 24px;
-      max-width: 280px; z-index: 100;
-      display: flex; flex-direction: column; gap: 8px;
-      pointer-events: none;
-    }
+    /* Live feed */
+    .live-feed { position: fixed; bottom: 24px; left: 24px; max-width: 280px; z-index: 100; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
     .feed-item {
-      background: var(--ink); color: var(--white);
-      font-size: 0.78rem; padding: 10px 14px;
-      border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-      animation: slide-up 0.3s ease;
-      pointer-events: auto;
+      background: linear-gradient(135deg, var(--p900), var(--p700));
+      color: var(--white); font-size: 0.78rem; padding: 10px 14px;
+      border-radius: 10px; box-shadow: 0 4px 16px rgba(109,40,217,0.3);
+      animation: slide-up 0.3s ease; pointer-events: auto;
     }
-    @keyframes slide-up { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+    @keyframes slide-up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+
+    .input-prefix-wrap { position: relative; }
+    .input-prefix-wrap .prefix { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--ink-soft); font-size: 0.9rem; pointer-events: none; font-weight: 500; z-index:2; }
+    .input-prefix-wrap .prefix-div { position: absolute; left: 44px; top: 50%; transform: translateY(-50%); height: 20px; width: 1px; background: var(--border); }
+    .input-prefix-wrap .form-input { padding-left: 58px; }
   </style>
 </head>
 <body>
@@ -116,23 +73,20 @@
     <div class="nav__links">
       <button class="nav__link" onclick="location.href='how.html'">How it works</button>
       <button class="nav__link" onclick="location.href='login.html'">Login</button>
-      <button class="nav__cta nav__link--active" style="background:var(--accent);">Get protected</button>
+      <button class="nav__cta" style="background: linear-gradient(135deg,var(--p800),var(--p600));">Get protected</button>
     </div>
   </div>
 </nav>
 
-<!-- Live activity feed -->
 <div class="live-feed" id="live-feed"></div>
 
 <main class="page fade-in">
   <div class="reg-wrap">
-    <div class="reg-eyebrow">🛡 Create account</div>
-    <h1 class="reg-title">Get covered in<br>under 2 minutes.</h1>
-    <p class="reg-sub">Already registered? <a href="login.html" style="color:var(--accent); font-weight:500;">Log in →</a></p>
+    <div class="eyebrow-pill">🛡 Create account</div>
+    <h1 class="form-page__title">Get covered in<br>under 2 minutes.</h1>
+    <p class="form-page__sub">Already registered? <a onclick="location.href='login.html'">Log in →</a></p>
 
-    <div class="reg-card">
-
-      <!-- Form -->
+    <div class="form-card">
       <div id="reg-form">
         <div class="form-row">
           <div class="form-group">
@@ -141,15 +95,15 @@
           </div>
           <div class="form-group">
             <label class="form-label" for="inp-phone">Mobile number</label>
-            <div style="position:relative;">
-              <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:0.9rem;pointer-events:none;">+91</span>
-              <input class="form-input" id="inp-phone" type="tel" placeholder="9876543210"
-                maxlength="10" inputmode="numeric" style="padding-left:44px;" autocomplete="tel-national" />
+            <div class="input-prefix-wrap">
+              <span class="prefix">+91</span>
+              <div class="prefix-div"></div>
+              <input class="form-input" id="inp-phone" type="tel" placeholder="9876543210" maxlength="10" inputmode="numeric" autocomplete="tel-national" />
             </div>
           </div>
         </div>
 
-        <div class="form-row" style="margin-top:16px;">
+        <div class="form-row" style="margin-top:4px;">
           <div class="form-group">
             <label class="form-label" for="inp-city">City</label>
             <div class="select-wrap">
@@ -166,18 +120,13 @@
           </div>
           <div class="form-group">
             <label class="form-label" for="inp-earnings">Weekly earnings (₹)</label>
-            <input class="form-input" id="inp-earnings" type="number"
-              placeholder="6000" value="6000" min="1000" max="50000" inputmode="numeric"
-              onchange="updatePremiumPreview()" />
+            <input class="form-input" id="inp-earnings" type="number" placeholder="6000" value="6000" min="1000" max="50000" inputmode="numeric" onchange="updatePremiumPreview()" />
           </div>
         </div>
 
-        <div class="form-group" style="margin-top:16px;">
-          <label class="form-label" for="inp-upi">
-            UPI ID <span style="color:var(--ink-faint);font-weight:400;">(for automatic payouts)</span>
-          </label>
-          <input class="form-input" id="inp-upi" type="text"
-            placeholder="yourname@upi" autocomplete="off" />
+        <div class="form-group">
+          <label class="form-label" for="inp-upi">UPI ID <span style="color:var(--ink-faint);font-weight:400;text-transform:none;">(for automatic payouts)</span></label>
+          <input class="form-input" id="inp-upi" type="text" placeholder="yourname@upi" autocomplete="off" />
         </div>
 
         <!-- ML Premium Preview -->
@@ -185,10 +134,7 @@
           <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
             <div>
               <div class="premium-preview__label">ML-calculated weekly premium</div>
-              <div class="premium-preview__price">
-                ₹<span id="prev-premium">—</span>
-                <span>/week</span>
-              </div>
+              <div class="premium-preview__price">₹<span id="prev-premium">—</span><span>/week</span></div>
               <div class="premium-preview__sub">Coverage: ₹1,500 per week</div>
             </div>
             <div style="text-align:right;">
@@ -204,20 +150,18 @@
         <button class="btn btn--primary btn--full" id="btn-register" style="margin-top:24px;">
           Create account →
         </button>
-
         <p style="font-size:0.73rem;color:var(--ink-faint);text-align:center;margin-top:12px;line-height:1.5;">
-          By registering you accept our terms. Your phone number is verified via OTP before registration.
+          By registering you accept our terms. Your phone number is verified via OTP.
         </p>
       </div>
 
-      <!-- Success state -->
+      <!-- Success -->
       <div class="reg-success" id="reg-success">
         <div class="reg-success__icon">🎉</div>
         <div class="reg-success__title">You're protected!</div>
         <p class="reg-success__sub" id="success-msg">Your account is ready. Activate your policy to start receiving payouts.</p>
         <button class="btn btn--primary btn--full" id="btn-to-dashboard">Go to dashboard →</button>
       </div>
-
     </div>
   </div>
 
@@ -242,134 +186,83 @@ const CITY_RISK = {
   Visakhapatnam:{rain:1100,temp:40,aqi:90,flood:1.2},Coimbatore:{rain:700,temp:36,aqi:80,flood:0.4},
 };
 
-function calcPremium(city, weeklyEarnings = 6000) {
+function calcPremium(city, weeklyEarnings=6000) {
   const cf = CITY_RISK[city] || {rain:900,temp:40,aqi:120,flood:0.8};
-  const rainS  = Math.min(cf.rain / 2400, 1);
-  const tempS  = Math.max((cf.temp - 30) / 20, 0);
-  const aqiS   = Math.min(cf.aqi  / 350,  1);
-  const floodS = Math.min(cf.flood / 4,   1);
-  const overall = rainS*0.30 + tempS*0.20 + aqiS*0.15 + floodS*0.35;
-  const premium = Math.round(20 + overall * 30 + (weeklyEarnings / 12000) * 10);
-  const tier    = overall >= 0.6 ? "high" : overall >= 0.35 ? "medium" : "low";
-  return { premium, overall, tier,
-    breakdown: {
-      "Rainfall risk":     +(rainS*100).toFixed(1),
-      "Temperature risk":  +(tempS*100).toFixed(1),
-      "AQI risk":          +(aqiS*100).toFixed(1),
-      "Flood risk":        +(floodS*100).toFixed(1),
-    }
-  };
+  const rainS=Math.min(cf.rain/2400,1), tempS=Math.max((cf.temp-30)/20,0), aqiS=Math.min(cf.aqi/350,1), floodS=Math.min(cf.flood/4,1);
+  const overall=rainS*0.30+tempS*0.20+aqiS*0.15+floodS*0.35;
+  const premium=Math.round(20+overall*30+(weeklyEarnings/12000)*10);
+  const tier=overall>=0.6?"high":overall>=0.35?"medium":"low";
+  return { premium, tier, breakdown:{"Rainfall risk":+(rainS*100).toFixed(1),"Temperature risk":+(tempS*100).toFixed(1),"AQI risk":+(aqiS*100).toFixed(1),"Flood risk":+(floodS*100).toFixed(1)} };
 }
 
 function updatePremiumPreview() {
-  const city     = document.getElementById("inp-city").value;
-  const earnings = parseFloat(document.getElementById("inp-earnings").value) || 6000;
+  const city=document.getElementById("inp-city").value;
+  const earnings=parseFloat(document.getElementById("inp-earnings").value)||6000;
   if (!city) return;
-
-  const { premium, tier, breakdown } = calcPremium(city, earnings);
-  document.getElementById("prev-premium").textContent = premium;
-
-  const tierLabels = { high:"🔴 High risk", medium:"🟡 Medium risk", low:"🟢 Low risk" };
-  document.getElementById("prev-tier-badge").innerHTML =
-    `<span class="tier-badge tier-badge--${tier}">${tierLabels[tier]}</span>`;
-
-  document.getElementById("prev-breakdown").innerHTML = Object.entries(breakdown).map(([label, val]) => `
+  const {premium,tier,breakdown}=calcPremium(city,earnings);
+  document.getElementById("prev-premium").textContent=premium;
+  const labels={high:"🔴 High risk",medium:"🟡 Medium risk",low:"🟢 Low risk"};
+  document.getElementById("prev-tier-badge").innerHTML=`<span class="tier-badge tier-badge--${tier}">${labels[tier]}</span>`;
+  document.getElementById("prev-breakdown").innerHTML=Object.entries(breakdown).map(([l,v])=>`
     <div class="risk-bar-row">
-      <div class="risk-bar-row__label">${label}</div>
-      <div class="risk-bar"><div class="risk-bar__fill" style="width:${val}%"></div></div>
-      <div class="risk-bar-row__pct">${val}%</div>
+      <div class="risk-bar-row__label">${l}</div>
+      <div class="risk-bar"><div class="risk-bar__fill" style="width:${v}%"></div></div>
+      <div class="risk-bar-row__pct">${v}%</div>
     </div>`).join("");
-
   document.getElementById("premium-preview").classList.add("visible");
 }
 
-// Pre-fill phone from URL param
-const urlPhone = new URLSearchParams(location.search).get("phone");
-if (urlPhone) document.getElementById("inp-phone").value = urlPhone;
-
-// If already logged in, fill phone from session
-const sessionPhone = ZS_AUTH.getPhone();
-if (sessionPhone && !urlPhone) document.getElementById("inp-phone").value = sessionPhone;
-
-// Initial preview
+const urlPhone=new URLSearchParams(location.search).get("phone");
+if (urlPhone) document.getElementById("inp-phone").value=urlPhone;
+const sessionPhone=ZS_AUTH.getPhone();
+if (sessionPhone && !urlPhone) document.getElementById("inp-phone").value=sessionPhone;
 updatePremiumPreview();
 
-// ── Register ────────────────────────────────────────────────────────────────
 document.getElementById("btn-register").addEventListener("click", async () => {
-  const name    = document.getElementById("inp-name").value.trim();
-  const phone   = document.getElementById("inp-phone").value.trim();
-  const city    = document.getElementById("inp-city").value;
-  const earnings= document.getElementById("inp-earnings").value;
-  const upiId   = document.getElementById("inp-upi").value.trim();
-  const errEl   = document.getElementById("reg-err");
-
+  const name=document.getElementById("inp-name").value.trim();
+  const phone=document.getElementById("inp-phone").value.trim();
+  const city=document.getElementById("inp-city").value;
+  const earnings=document.getElementById("inp-earnings").value;
+  const upiId=document.getElementById("inp-upi").value.trim();
+  const errEl=document.getElementById("reg-err");
   errEl.classList.remove("visible");
-
-  if (!name)            return showErr("reg", "Name is required.");
-  if (!/^\d{10}$/.test(phone)) return showErr("reg", "Valid 10-digit phone required.");
-  if (!city)            return showErr("reg", "Please select your city.");
-
-  // Check if user is authenticated — if not, need to verify OTP first
-  if (!ZS_AUTH.isLoggedIn() || ZS_AUTH.getPhone() !== phone) {
-    // Redirect to login with phone pre-filled, come back after
-    location.href = `login.html?phone=${phone}&next=${encodeURIComponent(location.pathname + location.search)}`;
+  if (!name) return showErr("Name is required.");
+  if (!/^\d{10}$/.test(phone)) return showErr("Valid 10-digit phone required.");
+  if (!city) return showErr("Please select your city.");
+  if (!ZS_AUTH.isLoggedIn()||ZS_AUTH.getPhone()!==phone) {
+    location.href=`login.html?phone=${phone}&next=${encodeURIComponent(location.pathname+location.search)}`;
     return;
   }
-
-  const btn = document.getElementById("btn-register");
-  btn.textContent = "Creating account…"; btn.disabled = true;
-
-  const result = await apiFetch("POST", "/api/workers/register", {
-    name, city, weeklyEarnings: parseFloat(earnings) || 6000, upiId: upiId || null,
-  });
-
-  if (!result || !result.ok) {
-    const msg = result?.data?.error || "Registration failed.";
-    if (msg.includes("Already registered")) {
-      // Already exists — go to dashboard
-      location.href = `dashboard.html?phone=${phone}`;
-      return;
-    }
-    showErr("reg", msg);
-    btn.textContent = "Create account →"; btn.disabled = false;
-    return;
+  const btn=document.getElementById("btn-register");
+  btn.textContent="Creating account…"; btn.disabled=true;
+  const result=await apiFetch("POST","/api/workers/register",{name,city,weeklyEarnings:parseFloat(earnings)||6000,upiId:upiId||null});
+  if (!result||!result.ok) {
+    const msg=result?.data?.error||"Registration failed.";
+    if (msg.includes("Already registered")) { location.href=`dashboard.html?phone=${phone}`; return; }
+    showErr(msg); btn.textContent="Create account →"; btn.disabled=false; return;
   }
-
-  const worker = result.data.worker;
-  ZS_AUTH.save({ worker });
-
-  // Show success
-  document.getElementById("reg-form").style.display = "none";
+  const worker=result.data.worker;
+  ZS_AUTH.save({worker});
+  document.getElementById("reg-form").style.display="none";
   document.getElementById("reg-success").classList.add("visible");
-  document.getElementById("success-msg").textContent =
-    `Welcome, ${worker.name}! Your ML-calculated premium is ₹${worker.premium}/week with ₹1,500 coverage.`;
-  document.getElementById("btn-to-dashboard").onclick =
-    () => location.href = `dashboard.html?phone=${phone}`;
-  setTimeout(() => location.href = `dashboard.html?phone=${phone}`, 2500);
+  document.getElementById("success-msg").textContent=`Welcome, ${worker.name}! Your ML-calculated premium is ₹${worker.premium}/week with ₹1,500 coverage.`;
+  document.getElementById("btn-to-dashboard").onclick=()=>location.href=`dashboard.html?phone=${phone}`;
+  setTimeout(()=>location.href=`dashboard.html?phone=${phone}`,2500);
 });
 
-function showErr(panel, msg) {
-  const el = document.getElementById(`${panel}-err`);
-  el.textContent = msg; el.classList.add("visible");
+function showErr(msg) {
+  const el=document.getElementById("reg-err");
+  el.textContent=msg; el.classList.add("visible");
 }
 
-// ── Real-time: show live activity from other registrations ─────────────────
-ZS_EVENTS.on("admin_new_worker", data => {
-  if (data.worker?.city) {
-    pushFeed(`👷 New worker joined from ${data.worker.city}`);
-  }
-});
-ZS_EVENTS.on("admin_new_claim", data => {
-  pushFeed(`⚡ Claim triggered — ${data.claim?.workerId?.city || "a city"}`);
-});
+ZS_EVENTS.on("admin_new_worker",data=>{ if(data.worker?.city) pushFeed(`👷 New worker joined from ${data.worker.city}`); });
+ZS_EVENTS.on("admin_new_claim",data=>{ pushFeed(`⚡ Claim triggered — ${data.claim?.workerId?.city||"a city"}`); });
 
 function pushFeed(msg) {
-  const feed = document.getElementById("live-feed");
-  const item = document.createElement("div");
-  item.className = "feed-item";
-  item.textContent = msg;
-  feed.appendChild(item);
-  setTimeout(() => item.remove(), 5000);
+  const feed=document.getElementById("live-feed");
+  const item=document.createElement("div");
+  item.className="feed-item"; item.textContent=msg;
+  feed.appendChild(item); setTimeout(()=>item.remove(),5000);
 }
 </script>
 </body>

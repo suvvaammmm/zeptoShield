@@ -4,7 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — ZeptoShield</title>
-  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/theme.css" />
+  <style>
+    .dash-header-area {
+      background: linear-gradient(135deg, var(--p950), var(--p800));
+      padding: 96px 0 40px;
+      margin-bottom: 0;
+    }
+    .dash-header-inner {
+      max-width: 900px; margin: 0 auto; padding: 0 40px;
+    }
+    .dash-greeting { font-family: var(--serif); font-size: 2rem; color: var(--white); letter-spacing: -0.02em; margin-bottom: 6px; }
+    .dash-meta { font-size: 0.875rem; color: var(--p300); }
+    .dash-body { max-width: 900px; margin: 0 auto; padding: 32px 40px 80px; }
+    .dash-kpi-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px; margin-top: -28px; }
+    .kpi {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 24px;
+      position: relative; overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    .kpi::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; background: linear-gradient(90deg, var(--p600), var(--p400)); }
+    .kpi__label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint); margin-bottom: 8px; }
+    .kpi__val { font-family: var(--serif); font-size: 1.8rem; color: var(--ink); letter-spacing: -0.03em; }
+    .kpi__val--green { color: var(--success); }
+    @media (max-width: 860px) { .dash-header-inner, .dash-body { padding-left:24px; padding-right:24px; } .dash-kpi-row { grid-template-columns:1fr; margin-top:0; } }
+  </style>
 </head>
 <body>
 
@@ -20,141 +45,96 @@
 </nav>
 
 <main class="page fade-in">
-  <div class="dash-wrap">
 
-    <div id="loading" style="text-align:center; padding:80px 0; color:var(--ink-faint); font-size:0.875rem;">
+  <!-- Purple header area -->
+  <div class="dash-header-area" id="dash-header-area" style="display:none;">
+    <div class="dash-header-inner">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div class="dash-greeting" id="d-greeting"></div>
+          <div class="dash-meta" id="d-meta"></div>
+        </div>
+        <div id="ml-model-badge" style="display:none;">
+          <span class="ml-badge" style="background:rgba(196,181,253,0.15);color:var(--p300);border-color:rgba(196,181,253,0.2);">🤖 ML-powered premium</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-body">
+
+    <div id="loading" style="text-align:center;padding:80px 0;color:var(--ink-faint);font-size:0.875rem;">
       Loading your dashboard…
     </div>
 
-    <div id="error-state" style="display:none; text-align:center; padding:80px 0;">
-      <p style="color:var(--ink-soft); margin-bottom:16px;">No account found for this number.</p>
+    <div id="error-state" style="display:none;text-align:center;padding:80px 0;">
+      <p style="color:var(--ink-soft);margin-bottom:16px;">No account found for this number.</p>
       <a class="btn btn--primary" href="register.html">Register now →</a>
     </div>
 
     <div id="dashboard" style="display:none;">
 
-      <!-- Header -->
-      <div class="dash-top">
-        <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-          <div>
-            <div class="dash-greeting" id="d-greeting"></div>
-            <div class="dash-meta" id="d-meta"></div>
-          </div>
-          <div id="ml-model-badge" style="display:none;">
-            <span class="ml-badge">🤖 ML-powered premium</span>
-          </div>
-        </div>
-      </div>
-
       <!-- KPIs -->
       <div class="dash-kpi-row">
-        <div class="kpi">
-          <div class="kpi__label">Policy status</div>
-          <div class="kpi__val" id="kpi-status"></div>
-        </div>
-        <div class="kpi">
-          <div class="kpi__label">Total claims</div>
-          <div class="kpi__val" id="kpi-claims"></div>
-        </div>
-        <div class="kpi">
-          <div class="kpi__label">Total received</div>
-          <div class="kpi__val kpi__val--green" id="kpi-payout"></div>
-        </div>
+        <div class="kpi"><div class="kpi__label">Policy status</div><div class="kpi__val" id="kpi-status"></div></div>
+        <div class="kpi"><div class="kpi__label">Total claims</div><div class="kpi__val" id="kpi-claims"></div></div>
+        <div class="kpi"><div class="kpi__label">Total received</div><div class="kpi__val kpi__val--green" id="kpi-payout"></div></div>
       </div>
 
-      <!-- LIVE WEATHER PANEL -->
+      <!-- LIVE WEATHER -->
       <div class="weather-panel" id="weather-panel">
         <div class="weather-panel__head">
           <div class="weather-panel__city" id="w-city">Live conditions</div>
           <div class="weather-panel__source" id="w-source">Fetching…</div>
         </div>
         <div class="weather-grid" id="w-grid">
-          <div class="weather-cell">
-            <div class="weather-cell__icon">🌡</div>
-            <div class="weather-cell__val" id="w-temp"><div class="loading-shimmer" style="width:60px;"></div></div>
-            <div class="weather-cell__label">Temperature</div>
-          </div>
-          <div class="weather-cell">
-            <div class="weather-cell__icon">🌧</div>
-            <div class="weather-cell__val" id="w-rain"><div class="loading-shimmer" style="width:60px;"></div></div>
-            <div class="weather-cell__label">Rainfall today</div>
-          </div>
-          <div class="weather-cell">
-            <div class="weather-cell__icon">🏭</div>
-            <div class="weather-cell__val" id="w-aqi"><div class="loading-shimmer" style="width:60px;"></div></div>
-            <div class="weather-cell__label">AQI</div>
-          </div>
-          <div class="weather-cell">
-            <div class="weather-cell__icon">⚡</div>
-            <div class="weather-cell__val" id="w-risk"><div class="loading-shimmer" style="width:60px;"></div></div>
-            <div class="weather-cell__label">ML Risk score</div>
-          </div>
+          <div class="weather-cell"><div class="weather-cell__icon">🌡</div><div class="weather-cell__val" id="w-temp"><div class="loading-shimmer" style="width:60px;"></div></div><div class="weather-cell__label">Temperature</div></div>
+          <div class="weather-cell"><div class="weather-cell__icon">🌧</div><div class="weather-cell__val" id="w-rain"><div class="loading-shimmer" style="width:60px;"></div></div><div class="weather-cell__label">Rainfall today</div></div>
+          <div class="weather-cell"><div class="weather-cell__icon">🏭</div><div class="weather-cell__val" id="w-aqi"><div class="loading-shimmer" style="width:60px;"></div></div><div class="weather-cell__label">AQI</div></div>
+          <div class="weather-cell"><div class="weather-cell__icon">⚡</div><div class="weather-cell__val" id="w-risk"><div class="loading-shimmer" style="width:60px;"></div></div><div class="weather-cell__label">ML Risk score</div></div>
         </div>
         <div class="alerts-row" id="alerts-row">
           <span class="alerts-row__label">Triggers</span>
-          <span id="alerts-content" style="font-size:0.78rem; color:var(--ink-faint);">Checking…</span>
+          <span id="alerts-content" style="font-size:0.78rem;color:var(--ink-faint);">Checking…</span>
         </div>
       </div>
 
       <!-- Policy: inactive -->
       <div class="block" id="policy-inactive" style="display:none;">
-        <div class="block__head">
-          <div class="block__title">Insurance policy</div>
-          <span class="block__badge badge--inactive">Not active</span>
-        </div>
+        <div class="block__head"><div class="block__title">Insurance policy</div><span class="block__badge badge--inactive">Not active</span></div>
         <div class="block__body">
-          <p style="font-size:0.875rem; color:var(--ink-soft); margin-bottom:20px; font-weight:300; line-height:1.7;">
-            Activate your policy to start receiving automatic payouts when environmental disruptions hit your city.
-          </p>
-          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+          <p style="font-size:0.875rem;color:var(--ink-soft);margin-bottom:20px;line-height:1.7;">Activate your policy to start receiving automatic payouts when environmental disruptions hit your city.</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
             <div>
-              <div style="font-size:0.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.06em; font-weight:500; margin-bottom:4px;">ML-calculated premium</div>
-              <div style="font-family:var(--serif); font-size:2rem; letter-spacing:-0.03em;" id="act-price"></div>
+              <div style="font-size:0.68rem;color:var(--p600);text-transform:uppercase;letter-spacing:0.07em;font-weight:700;margin-bottom:4px;">ML-calculated premium</div>
+              <div style="font-family:var(--serif);font-size:2rem;letter-spacing:-0.03em;color:var(--ink);" id="act-price"></div>
             </div>
             <div>
-              <div style="font-size:0.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.06em; font-weight:500; margin-bottom:4px;">Weekly coverage</div>
-              <div style="font-family:var(--serif); font-size:2rem; letter-spacing:-0.03em; color:var(--success);">₹1,500</div>
+              <div style="font-size:0.68rem;color:var(--p600);text-transform:uppercase;letter-spacing:0.07em;font-weight:700;margin-bottom:4px;">Weekly coverage</div>
+              <div style="font-family:var(--serif);font-size:2rem;letter-spacing:-0.03em;color:var(--success);">₹1,500</div>
             </div>
             <button class="btn btn--primary" id="activate-btn">Activate shield →</button>
           </div>
-
-          <!-- ML breakdown if available -->
-          <div id="activation-breakdown" style="display:none; margin-top:20px;"></div>
+          <div id="activation-breakdown" style="display:none;margin-top:20px;"></div>
         </div>
       </div>
 
       <!-- Policy: active -->
       <div class="block" id="policy-active" style="display:none;">
-        <div class="block__head">
-          <div class="block__title">Insurance policy</div>
-          <span class="block__badge badge--active">Active</span>
-        </div>
+        <div class="block__head"><div class="block__title">Insurance policy</div><span class="block__badge badge--active">Active</span></div>
         <div class="block__body">
           <div class="inline-grid">
-            <div>
-              <div class="inline-field__label">Weekly premium</div>
-              <div class="inline-field__val" id="p-premium"></div>
-            </div>
-            <div>
-              <div class="inline-field__label">Coverage</div>
-              <div class="inline-field__val">₹1,500 / week</div>
-            </div>
-            <div>
-              <div class="inline-field__label">Active since</div>
-              <div class="inline-field__val" id="p-since"></div>
-            </div>
+            <div><div class="inline-field__label">Weekly premium</div><div class="inline-field__val" id="p-premium"></div></div>
+            <div><div class="inline-field__label">Coverage</div><div class="inline-field__val">₹1,500 / week</div></div>
+            <div><div class="inline-field__label">Active since</div><div class="inline-field__val" id="p-since"></div></div>
           </div>
-          <!-- ML risk breakdown -->
-          <div id="policy-ml-breakdown" style="display:none; margin-top:16px;"></div>
+          <div id="policy-ml-breakdown" style="display:none;margin-top:16px;"></div>
         </div>
       </div>
 
       <!-- Trigger simulator -->
       <div class="block" id="trigger-block" style="display:none;">
-        <div class="block__head">
-          <div class="block__title">Simulate a trigger</div>
-          <span style="font-size:0.75rem; color:var(--ink-faint);">Includes ML fraud check</span>
-        </div>
+        <div class="block__head"><div class="block__title">Simulate a trigger</div><span style="font-size:0.75rem;color:var(--ink-faint);">Includes ML fraud check</span></div>
         <div class="block__body">
           <div class="trigger-form">
             <div>
@@ -175,40 +155,24 @@
             <button class="btn btn--primary" id="trigger-btn">Trigger →</button>
           </div>
 
-          <!-- Advanced fraud signals (collapsible) -->
           <details style="margin-top:16px;">
-            <summary style="font-size:0.78rem; color:var(--ink-soft); cursor:pointer; font-weight:500; user-select:none;">
-              ⚙ Fraud signal inputs (optional)
-            </summary>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px;">
-              <div>
-                <label class="form-label">Location variance (0–1)</label>
-                <input class="form-input" id="f-location" type="number" step="0.1" min="0" max="1" placeholder="0.8 = natural" value="0.8" />
-              </div>
-              <div>
-                <label class="form-label">Speed consistency (0–1)</label>
-                <input class="form-input" id="f-speed" type="number" step="0.1" min="0" max="1" placeholder="0.75 = normal" value="0.75" />
-              </div>
-              <div>
-                <label class="form-label">Device changes (30d)</label>
-                <input class="form-input" id="f-devices" type="number" min="0" placeholder="0" value="0" />
-              </div>
-              <div>
-                <label class="form-label">Similar device cluster</label>
-                <input class="form-input" id="f-cluster" type="number" min="0" placeholder="0" value="0" />
-              </div>
-              <div style="display:flex; align-items:center; gap:8px; padding-top:20px;">
-                <input type="checkbox" id="f-ipmismatch" />
-                <label for="f-ipmismatch" style="font-size:0.82rem; color:var(--ink-soft);">IP/GPS mismatch</label>
+            <summary style="font-size:0.78rem;color:var(--ink-soft);cursor:pointer;font-weight:500;user-select:none;">⚙ Fraud signal inputs (optional)</summary>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;">
+              <div><label class="form-label">Location variance (0–1)</label><input class="form-input" id="f-location" type="number" step="0.1" min="0" max="1" value="0.8"/></div>
+              <div><label class="form-label">Speed consistency (0–1)</label><input class="form-input" id="f-speed" type="number" step="0.1" min="0" max="1" value="0.75"/></div>
+              <div><label class="form-label">Device changes (30d)</label><input class="form-input" id="f-devices" type="number" min="0" value="0"/></div>
+              <div><label class="form-label">Similar device cluster</label><input class="form-input" id="f-cluster" type="number" min="0" value="0"/></div>
+              <div style="display:flex;align-items:center;gap:8px;padding-top:20px;">
+                <input type="checkbox" id="f-ipmismatch"/>
+                <label for="f-ipmismatch" style="font-size:0.82rem;color:var(--ink-soft);">IP/GPS mismatch</label>
               </div>
             </div>
           </details>
-
           <p class="trigger-note">Thresholds: Rain ≥ 40 mm · Heat ≥ 42°C · AQI ≥ 350 · Flood ≥ 1</p>
         </div>
       </div>
 
-      <!-- Trust score / fraud result -->
+      <!-- Trust score -->
       <div class="trust-block" id="trust-block" style="display:none;">
         <div class="trust-block__head">
           <div class="trust-block__title">ML Fraud Analysis</div>
@@ -221,7 +185,7 @@
       <div class="block">
         <div class="block__head">
           <div class="block__title">Claim history</div>
-          <span style="font-size:0.78rem; color:var(--ink-faint);" id="claims-count"></span>
+          <span style="font-size:0.78rem;color:var(--ink-faint);" id="claims-count"></span>
         </div>
         <div class="block__body" id="claims-body">
           <div class="claims-empty">No claims yet. When a trigger fires, your payout history will appear here.</div>
@@ -248,268 +212,158 @@
   const EVENT_LABELS = { rain:"Reading (mm)", heat:"Temperature (°C)", aqi:"AQI value", flood:"Severity (≥1)" };
   const EVENT_NAMES  = { rain:"🌧 Heavy Rainfall", heat:"🌡 Extreme Heat", aqi:"🏭 Severe AQI", flood:"🌊 Flood Alert" };
   const TRUST_COLORS = { green:"var(--success)", amber:"var(--warn)", red:"#B91C1C" };
-  const ACTION_TEXT  = {
-    instant_payout:      "Instant payout — no verification needed",
-    quick_verification:  "Quick verification required before payout",
-    flag_and_review:     "Flagged for manual review — payout held",
-  };
+  const ACTION_TEXT  = { instant_payout:"Instant payout — no verification needed", quick_verification:"Quick verification required before payout", flag_and_review:"Flagged for manual review — payout held" };
 
   let WORKER = null;
 
-  function fmt(d)   { return new Date(d).toLocaleDateString("en-IN", { day:"numeric", month:"short" }); }
-  function fmtDT(d) { return new Date(d).toLocaleDateString("en-IN", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }); }
-  function cap(s)   { return s.charAt(0).toUpperCase() + s.slice(1); }
-  function show(id) { const e = document.getElementById(id); if(e) e.style.display = ""; }
-  function hide(id) { const e = document.getElementById(id); if(e) e.style.display = "none"; }
+  function fmt(d)   { return new Date(d).toLocaleDateString("en-IN",{day:"numeric",month:"short"}); }
+  function fmtDT(d) { return new Date(d).toLocaleDateString("en-IN",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}); }
+  function cap(s)   { return s.charAt(0).toUpperCase()+s.slice(1); }
+  function show(id) { const e=document.getElementById(id); if(e) e.style.display=""; }
+  function hide(id) { const e=document.getElementById(id); if(e) e.style.display="none"; }
 
   function renderBreakdown(bd) {
     if (!bd) return "";
-    const rows = [
-      { label:"Rainfall risk",    val: bd.rainfall_risk    },
-      { label:"Temperature risk", val: bd.temperature_risk },
-      { label:"AQI risk",         val: bd.aqi_risk         },
-      { label:"Flood risk",       val: bd.flood_risk       },
-    ];
-    return `
-      <div class="ml-breakdown">
-        <div class="ml-breakdown__title">ML risk factor breakdown</div>
-        ${rows.map(r => `
-          <div class="breakdown-row">
-            <div class="breakdown-row__label">${r.label}</div>
-            <div class="breakdown-bar"><div class="breakdown-bar__fill" style="width:${r.val}%"></div></div>
-            <div class="breakdown-row__pct">${r.val}%</div>
-          </div>
-        `).join("")}
-      </div>
-    `;
+    return `<div class="ml-breakdown"><div class="ml-breakdown__title">ML risk factor breakdown</div>${
+      [["Rainfall risk",bd.rainfall_risk],["Temperature risk",bd.temperature_risk],["AQI risk",bd.aqi_risk],["Flood risk",bd.flood_risk]].map(([l,v])=>`
+        <div class="breakdown-row">
+          <div class="breakdown-row__label">${l}</div>
+          <div class="breakdown-bar"><div class="breakdown-bar__fill" style="width:${v}%"></div></div>
+          <div class="breakdown-row__pct">${v}%</div>
+        </div>`).join("")
+    }</div>`;
   }
 
   function renderTrustScore(fraud) {
     if (!fraud) return "";
-    const col  = TRUST_COLORS[fraud.color] || "var(--ink)";
+    const col = TRUST_COLORS[fraud.color]||"var(--ink)";
     const signalsHTML = fraud.signals.length > 0
-      ? `<div class="signal-list">${fraud.signals.map(s => `
-          <div class="signal-item">
-            <div>
-              <div class="signal-item__flag">${s.flag}</div>
-              <div class="signal-item__val">${s.value}</div>
-            </div>
-            <span class="signal-weight signal-weight--${s.weight}">${s.weight}</span>
-          </div>
-        `).join("")}</div>`
+      ? `<div class="signal-list">${fraud.signals.map(s=>`<div class="signal-item"><div><div class="signal-item__flag">${s.flag}</div><div class="signal-item__val">${s.value}</div></div><span class="signal-weight signal-weight--${s.weight}">${s.weight}</span></div>`).join("")}</div>`
       : `<div class="no-signals">✓ No suspicious signals detected</div>`;
-
     return `
       <div class="trust-score-row">
-        <div class="trust-circle" style="color:${col}; border-color:${col};">
+        <div class="trust-circle" style="color:${col};border-color:${col};">
           <div class="trust-circle__num" style="color:${col};">${fraud.trust_score}</div>
           <div class="trust-circle__label" style="color:${col};">/ 100</div>
         </div>
         <div class="trust-details">
           <div class="trust-details__level" style="color:${col};">${fraud.risk_level} fraud risk</div>
-          <div class="trust-details__action">${ACTION_TEXT[fraud.action] || fraud.action}</div>
-          <div style="margin-top:6px; font-size:0.75rem; color:var(--ink-faint);">
-            Fraud prob: ${fraud.fraud_probability}% · Anomaly: ${fraud.anomaly_score}
-          </div>
+          <div class="trust-details__action">${ACTION_TEXT[fraud.action]||fraud.action}</div>
+          <div style="margin-top:6px;font-size:0.75rem;color:var(--ink-faint);">Fraud prob: ${fraud.fraud_probability}% · Anomaly: ${fraud.anomaly_score}</div>
         </div>
       </div>
-      <div class="trust-bar">
-        <div class="trust-bar__fill" style="width:${fraud.trust_score}%; background:${col};"></div>
-      </div>
-      ${fraud.signals.length > 0 ? `<div style="font-size:0.78rem; font-weight:500; color:var(--ink-soft); margin-bottom:10px;">Flagged signals</div>` : ""}
+      <div class="trust-bar"><div class="trust-bar__fill" style="width:${fraud.trust_score}%;background:${col};"></div></div>
+      ${fraud.signals.length > 0 ? `<div style="font-size:0.78rem;font-weight:600;color:var(--ink-soft);margin-bottom:10px;">Flagged signals</div>` : ""}
       ${signalsHTML}
-      <div style="margin-top:14px; font-size:0.75rem; color:var(--ink-faint); font-style:italic;">
-        "${fraud.explanation}"
-      </div>
-    `;
+      <div style="margin-top:14px;font-size:0.75rem;color:var(--ink-faint);font-style:italic;">"${fraud.explanation}"</div>`;
   }
 
   async function loadWeather(city) {
     const data = await ZS.api("GET", `/weather/${city}`);
-    if (!data || !data.weather) {
-      document.getElementById("w-source").textContent = "Unavailable";
-      document.getElementById("alerts-content").textContent = "Weather data unavailable";
-      return;
-    }
-
-    const w  = data.weather;
-    const ml = data.ml_risk_profile;
-
-    document.getElementById("w-city").textContent   = `${city} — live conditions`;
-    document.getElementById("w-source").textContent = `Source: ${w.source || "Open-Meteo"} · ${new Date(w.fetched_at).toLocaleTimeString("en-IN")}`;
-    document.getElementById("w-temp").textContent   = w.temperature_c !== null ? `${w.temperature_c}°C` : "—";
-    document.getElementById("w-rain").textContent   = w.rainfall_mm !== null ? `${w.rainfall_mm} mm` : "—";
-    document.getElementById("w-aqi").textContent    = w.aqi !== null ? w.aqi : "—";
-
-    // Color code AQI
+    if (!data||!data.weather) { document.getElementById("w-source").textContent="Unavailable"; return; }
+    const w=data.weather; const ml=data.ml_risk_profile;
+    document.getElementById("w-city").textContent=`${city} — live conditions`;
+    document.getElementById("w-source").textContent=`Source: ${w.source||"Open-Meteo"} · ${new Date(w.fetched_at).toLocaleTimeString("en-IN")}`;
+    document.getElementById("w-temp").textContent=w.temperature_c!==null?`${w.temperature_c}°C`:"—";
+    document.getElementById("w-rain").textContent=w.rainfall_mm!==null?`${w.rainfall_mm} mm`:"—";
+    document.getElementById("w-aqi").textContent=w.aqi!==null?w.aqi:"—";
     if (w.aqi) {
-      const aqiEl = document.getElementById("w-aqi");
-      if (w.aqi >= 350)      aqiEl.style.color = "#B91C1C";
-      else if (w.aqi >= 150) aqiEl.style.color = "var(--warn)";
-      else                   aqiEl.style.color = "var(--success)";
+      const aqiEl=document.getElementById("w-aqi");
+      aqiEl.style.color=w.aqi>=350?"#B91C1C":w.aqi>=150?"var(--warn)":"var(--success)";
     }
-
     if (ml) {
-      document.getElementById("w-risk").textContent = `${(ml.risk_score * 100).toFixed(0)}%`;
-      const riskEl = document.getElementById("w-risk");
-      riskEl.style.color = ml.risk_score >= 0.6 ? "#B91C1C" : ml.risk_score >= 0.35 ? "var(--warn)" : "var(--success)";
+      document.getElementById("w-risk").textContent=`${(ml.risk_score*100).toFixed(0)}%`;
+      document.getElementById("w-risk").style.color=ml.risk_score>=0.6?"#B91C1C":ml.risk_score>=0.35?"var(--warn)":"var(--success)";
     }
-
-    // Alert pills
-    const alertsEl = document.getElementById("alerts-content");
-    const THRESH = { rain:{ field: w.rainfall_mm, limit:40, label:"Rain", unit:"mm" }, heat:{ field: w.temperature_c, limit:42, label:"Heat", unit:"°C" }, aqi:{ field: w.aqi, limit:350, label:"AQI", unit:"" }};
-    const triggered = Object.values(THRESH).filter(t => t.field !== null && t.field >= t.limit);
-
-    if (triggered.length > 0) {
-      alertsEl.innerHTML = triggered.map(t =>
-        `<span class="alert-pill alert-pill--triggered">⚠ ${t.label} ${t.field}${t.unit} — triggered</span>`
-      ).join(" ");
-    } else {
-      alertsEl.innerHTML = `<span class="alert-pill alert-pill--safe">✓ All conditions within safe range</span>`;
-    }
+    const alertsEl=document.getElementById("alerts-content");
+    const THRESH={rain:{field:w.rainfall_mm,limit:40,label:"Rain",unit:"mm"},heat:{field:w.temperature_c,limit:42,label:"Heat",unit:"°C"},aqi:{field:w.aqi,limit:350,label:"AQI",unit:""}};
+    const triggered=Object.values(THRESH).filter(t=>t.field!==null&&t.field>=t.limit);
+    if (triggered.length>0) alertsEl.innerHTML=triggered.map(t=>`<span class="alert-pill alert-pill--triggered">⚠ ${t.label} ${t.field}${t.unit} — triggered</span>`).join(" ");
+    else alertsEl.innerHTML=`<span class="alert-pill alert-pill--safe">✓ All conditions within safe range</span>`;
   }
 
   async function load() {
     if (!PHONE) { hide("loading"); show("error-state"); return; }
-
-    const data = await ZS.api("GET", `/workers/${PHONE}`);
+    const data=await ZS.api("GET",`/workers/${PHONE}`);
     hide("loading");
-
-    if (!data || data.error) { show("error-state"); return; }
-
-    const { worker, policy, claims } = data;
-    WORKER = worker;
-
-    // Header
-    document.getElementById("d-greeting").textContent = `Hey, ${worker.name.split(" ")[0]}.`;
-    document.getElementById("d-meta").textContent = `${worker.city} · ${cap(worker.riskTier || "medium")} risk · ₹${worker.premium}/week`;
+    if (!data||data.error) { show("error-state"); return; }
+    const {worker,policy,claims}=data;
+    WORKER=worker;
+    document.getElementById("d-greeting").textContent=`Hey, ${worker.name.split(" ")[0]}.`;
+    document.getElementById("d-meta").textContent=`${worker.city} · ${cap(worker.riskTier||"medium")} risk · ₹${worker.premium}/week`;
     if (worker.mlBreakdown) show("ml-model-badge");
-
-    // KPIs
-    const totalPayout = claims.filter(c => c.status === "approved").reduce((s,c) => s + c.payout, 0);
-    const statusEl = document.getElementById("kpi-status");
-    statusEl.textContent = policy ? "Active" : "Inactive";
-    statusEl.style.color = policy ? "var(--success)" : "var(--warn)";
-    document.getElementById("kpi-claims").textContent = claims.length;
-    document.getElementById("kpi-payout").textContent = `₹${totalPayout.toLocaleString("en-IN")}`;
-
-    // Policy sections
+    document.getElementById("dash-header-area").style.display="";
+    const totalPayout=claims.filter(c=>c.status==="approved").reduce((s,c)=>s+c.payout,0);
+    const statusEl=document.getElementById("kpi-status");
+    statusEl.textContent=policy?"Active":"Inactive";
+    statusEl.style.color=policy?"var(--success)":"var(--warn)";
+    document.getElementById("kpi-claims").textContent=claims.length;
+    document.getElementById("kpi-payout").textContent=`₹${totalPayout.toLocaleString("en-IN")}`;
     if (policy) {
       show("policy-active");
-      document.getElementById("p-premium").textContent = `₹${policy.premium} / week`;
-      document.getElementById("p-since").textContent   = fmt(policy.activatedAt);
-      if (worker.mlBreakdown) {
-        const bdEl = document.getElementById("policy-ml-breakdown");
-        bdEl.innerHTML = renderBreakdown(worker.mlBreakdown);
-        show("policy-ml-breakdown");
-      }
+      document.getElementById("p-premium").textContent=`₹${policy.premium} / week`;
+      document.getElementById("p-since").textContent=fmt(policy.activatedAt);
+      if (worker.mlBreakdown) { document.getElementById("policy-ml-breakdown").innerHTML=renderBreakdown(worker.mlBreakdown); show("policy-ml-breakdown"); }
       show("trigger-block");
     } else {
       show("policy-inactive");
-      document.getElementById("act-price").textContent = `₹${worker.premium}`;
-      if (worker.mlBreakdown) {
-        const bdEl = document.getElementById("activation-breakdown");
-        bdEl.innerHTML = renderBreakdown(worker.mlBreakdown);
-        show("activation-breakdown");
-      }
+      document.getElementById("act-price").textContent=`₹${worker.premium}`;
+      if (worker.mlBreakdown) { document.getElementById("activation-breakdown").innerHTML=renderBreakdown(worker.mlBreakdown); show("activation-breakdown"); }
     }
-
-    // Claims
-    const claimsBody = document.getElementById("claims-body");
-    document.getElementById("claims-count").textContent = `${claims.length} total`;
-    if (claims.length > 0) {
-      claimsBody.innerHTML = [...claims].reverse().map(c => {
-        const statusBadge = c.status === "approved"
-          ? `<span class="claim-row__payout">+₹${c.payout.toLocaleString("en-IN")}</span>`
-          : c.status === "flagged"
-          ? `<span style="font-size:0.75rem; color:#B91C1C; font-weight:600;">Flagged</span>`
-          : `<span style="font-size:0.75rem; color:var(--warn); font-weight:600;">Pending</span>`;
-        const trustLine = c.fraudAnalysis
-          ? `<div class="claim-row__date" style="margin-top:3px;">Trust score: ${c.fraudAnalysis.trust_score}/100 · ${c.fraudAnalysis.risk_level} fraud risk</div>`
-          : "";
-        return `
-          <div class="claim-row">
-            <div>
-              <div class="claim-row__event">${EVENT_NAMES[c.eventType]}</div>
-              <div class="claim-row__date">${fmtDT(c.createdAt)} · ${c.eventValue}${EVENT_UNITS[c.eventType]}</div>
-              ${trustLine}
-            </div>
-            ${statusBadge}
-          </div>
-        `;
+    const claimsBody=document.getElementById("claims-body");
+    document.getElementById("claims-count").textContent=`${claims.length} total`;
+    if (claims.length>0) {
+      claimsBody.innerHTML=[...claims].reverse().map(c=>{
+        const statusBadge=c.status==="approved"?`<span class="claim-row__payout">+₹${c.payout.toLocaleString("en-IN")}</span>`:c.status==="flagged"?`<span style="font-size:0.75rem;color:#B91C1C;font-weight:700;">Flagged</span>`:`<span style="font-size:0.75rem;color:var(--warn);font-weight:700;">Pending</span>`;
+        const trustLine=c.fraudAnalysis?`<div class="claim-row__date" style="margin-top:3px;">Trust score: ${c.fraudAnalysis.trust_score}/100 · ${c.fraudAnalysis.risk_level} fraud risk</div>`:"";
+        return `<div class="claim-row"><div><div class="claim-row__event">${EVENT_NAMES[c.eventType]}</div><div class="claim-row__date">${fmtDT(c.createdAt)} · ${c.eventValue}${EVENT_UNITS[c.eventType]}</div>${trustLine}</div>${statusBadge}</div>`;
       }).join("");
     }
-
     show("dashboard");
-
-    // Load live weather async
     loadWeather(worker.city);
   }
 
-  // Activate policy
   document.getElementById("activate-btn").addEventListener("click", async (e) => {
-    const btn = e.currentTarget;
-    btn.disabled = true; btn.textContent = "Activating…";
-    const data = await ZS.api("POST", "/policies/activate", { workerId: WORKER.id });
-    btn.disabled = false; btn.textContent = "Activate shield →";
-    if (data.error && data.error !== "Already active") {
-      Toast.show({ type:"error", title:"Error", sub: data.error }); return;
-    }
-    Toast.show({ type:"success", title:"Policy activated!", sub:`₹${WORKER.premium}/week · Coverage ₹1,500` });
-    setTimeout(load, 600);
+    const btn=e.currentTarget; btn.disabled=true; btn.textContent="Activating…";
+    const data=await ZS.api("POST","/policies/activate",{workerId:WORKER.id});
+    btn.disabled=false; btn.textContent="Activate shield →";
+    if (data.error&&data.error!=="Already active") { Toast.show({type:"error",title:"Error",sub:data.error}); return; }
+    Toast.show({type:"success",title:"Policy activated!",sub:`₹${WORKER.premium}/week · Coverage ₹1,500`});
+    setTimeout(load,600);
   });
 
-  // Trigger type label
-  document.getElementById("t-type").addEventListener("change", (e) => {
-    document.getElementById("t-val-label").textContent = EVENT_LABELS[e.target.value];
-    document.getElementById("t-val").value = "";
+  document.getElementById("t-type").addEventListener("change",(e)=>{
+    const EVENT_LABELS_MAP={rain:"Reading (mm)",heat:"Temperature (°C)",aqi:"AQI value",flood:"Severity (≥1)"};
+    document.getElementById("t-val-label").textContent=EVENT_LABELS_MAP[e.target.value];
+    document.getElementById("t-val").value="";
   });
 
-  // Simulate trigger with fraud check
   document.getElementById("trigger-btn").addEventListener("click", async (e) => {
-    const btn        = e.currentTarget;
-    const eventType  = document.getElementById("t-type").value;
-    const eventValue = document.getElementById("t-val").value;
-    if (!eventValue) { Toast.show({ type:"error", title:"Enter a value", sub:"Provide the environmental reading." }); return; }
-
-    btn.disabled = true; btn.textContent = "Running ML check…";
-
-    const data = await ZS.api("POST", "/claims/trigger", {
-      workerId:          WORKER.id,
-      eventType,
-      eventValue:        Number(eventValue),
-      location_variance: parseFloat(document.getElementById("f-location").value) || 0.8,
-      speed_consistency: parseFloat(document.getElementById("f-speed").value)    || 0.75,
-      device_changes:    parseInt(document.getElementById("f-devices").value)    || 0,
-      similar_cluster:   parseInt(document.getElementById("f-cluster").value)    || 0,
-      ip_mismatch:       document.getElementById("f-ipmismatch").checked,
+    const btn=e.currentTarget;
+    const eventType=document.getElementById("t-type").value;
+    const eventValue=document.getElementById("t-val").value;
+    if (!eventValue) { Toast.show({type:"error",title:"Enter a value",sub:"Provide the environmental reading."}); return; }
+    btn.disabled=true; btn.textContent="Running ML check…";
+    const data=await ZS.api("POST","/claims/trigger",{
+      workerId:WORKER.id, eventType, eventValue:Number(eventValue),
+      location_variance:parseFloat(document.getElementById("f-location").value)||0.8,
+      speed_consistency:parseFloat(document.getElementById("f-speed").value)||0.75,
+      device_changes:parseInt(document.getElementById("f-devices").value)||0,
+      similar_cluster:parseInt(document.getElementById("f-cluster").value)||0,
+      ip_mismatch:document.getElementById("f-ipmismatch").checked,
     });
-
-    btn.disabled = false; btn.textContent = "Trigger →";
-
-    if (data.error) { Toast.show({ type:"error", title:"Error", sub: data.error }); return; }
-
-    if (!data.triggered) {
-      Toast.show({ type:"error", title:"Threshold not met", sub:"The value doesn't cross the trigger threshold." });
-      return;
-    }
-
-    // Show trust score block
+    btn.disabled=false; btn.textContent="Trigger →";
+    if (data.error) { Toast.show({type:"error",title:"Error",sub:data.error}); return; }
+    if (!data.triggered) { Toast.show({type:"error",title:"Threshold not met",sub:"The value doesn't cross the trigger threshold."}); return; }
     if (data.fraud_check) {
-      document.getElementById("trust-body").innerHTML = renderTrustScore(data.fraud_check);
+      document.getElementById("trust-body").innerHTML=renderTrustScore(data.fraud_check);
       show("trust-block");
-      document.getElementById("trust-block").scrollIntoView({ behavior:"smooth", block:"nearest" });
+      document.getElementById("trust-block").scrollIntoView({behavior:"smooth",block:"nearest"});
     }
-
-    if (data.claim.status === "approved") {
-      Toast.show({ type:"success", title:"Claim approved!", sub:"₹1,500 payout credited to your wallet." });
-    } else if (data.claim.status === "flagged") {
-      Toast.show({ type:"error", title:"Claim flagged", sub:"ML fraud check flagged this claim for review." });
-    } else {
-      Toast.show({ type:"error", title:"Verification needed", sub:"Quick verification required before payout." });
-    }
-
-    setTimeout(load, 800);
+    if (data.claim.status==="approved") Toast.show({type:"success",title:"Claim approved!",sub:"₹1,500 payout credited to your wallet."});
+    else if (data.claim.status==="flagged") Toast.show({type:"error",title:"Claim flagged",sub:"ML fraud check flagged this claim for review."});
+    else Toast.show({type:"error",title:"Verification needed",sub:"Quick verification required before payout."});
+    setTimeout(load,800);
   });
 
   load();

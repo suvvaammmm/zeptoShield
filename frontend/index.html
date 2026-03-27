@@ -4,28 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZeptoShield — Income Protection for Delivery Partners</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/theme.css" />
 </head>
 <body>
 
-<!-- NAV -->
 <nav class="nav">
   <div class="nav__inner">
     <a class="nav__logo" href="index.html">Zepto<span>Shield</span></a>
     <div class="nav__links">
       <button class="nav__link" onclick="location.href='pages/how.html'">How it works</button>
       <button class="nav__link" onclick="location.href='pages/lookup.html'">My policy</button>
+      <button class="nav__link" onclick="location.href='pages/login.html'">Login</button>
       <button class="nav__cta" onclick="location.href='pages/register.html'">Get protected</button>
     </div>
   </div>
 </nav>
 
-<!-- HERO -->
 <main class="page fade-in">
+
+  <!-- HERO -->
   <section class="hero">
     <div class="hero__inner">
       <div>
-        <div class="hero__eyebrow">Zepto Partner Benefit</div>
+        <div class="hero__eyebrow">🛡 Zepto Partner Benefit</div>
         <h1 class="hero__h1">Your income,<br /><em>protected</em><br />automatically.</h1>
         <p class="hero__lead">When rain, heatwaves, or floods disrupt your deliveries, ZeptoShield pays you instantly — no claim forms, no waiting, no calls.</p>
         <div class="hero__actions">
@@ -34,7 +35,6 @@
         </div>
       </div>
 
-      <!-- Trigger preview card -->
       <div class="hero__panel">
         <div class="hero__panel-head">
           <div class="panel-label">Weekly coverage</div>
@@ -115,7 +115,7 @@
     </div>
   </div>
 
-  <!-- HOW IT WORKS PREVIEW -->
+  <!-- HOW IT WORKS -->
   <section class="section">
     <div class="section__inner">
       <div class="section__header">
@@ -124,42 +124,18 @@
         <p class="section__sub">When an environmental condition crosses a threshold in your city, your claim is automatically filed and paid. No forms, no documentation, no delays.</p>
       </div>
       <div class="steps">
-        <div class="step">
-          <div class="step__num">01</div>
-          <div class="step__title">Register</div>
-          <div class="step__desc">Create your profile with your name, phone number, and city. Under two minutes.</div>
-        </div>
-        <div class="step">
-          <div class="step__num">02</div>
-          <div class="step__title">Get assessed</div>
-          <div class="step__desc">Your city's risk profile is analysed — historical weather, AQI, flood data — to set your premium.</div>
-        </div>
-        <div class="step">
-          <div class="step__num">03</div>
-          <div class="step__title">Activate</div>
-          <div class="step__desc">One tap to go live. Your policy starts monitoring your city's environmental data 24/7.</div>
-        </div>
-        <div class="step">
-          <div class="step__num">04</div>
-          <div class="step__title">Trigger fires</div>
-          <div class="step__desc">A threshold is crossed — rainfall exceeds 40mm, AQI spikes past 350, a flood alert is issued.</div>
-        </div>
-        <div class="step">
-          <div class="step__num">05</div>
-          <div class="step__title">Claim approved</div>
-          <div class="step__desc">Your claim is auto-approved instantly. No adjuster, no waiting, no paperwork.</div>
-        </div>
-        <div class="step">
-          <div class="step__num">06</div>
-          <div class="step__title">Payout arrives</div>
-          <div class="step__desc">₹1,500 is credited to your Zepto wallet. You focus on your safety — we handle the rest.</div>
-        </div>
+        <div class="step"><div class="step__num">01</div><div class="step__title">Register</div><div class="step__desc">Create your profile with your name, phone number, and city. Under two minutes.</div></div>
+        <div class="step"><div class="step__num">02</div><div class="step__title">Get assessed</div><div class="step__desc">Your city's risk profile is analysed — historical weather, AQI, flood data — to set your premium.</div></div>
+        <div class="step"><div class="step__num">03</div><div class="step__title">Activate</div><div class="step__desc">One tap to go live. Your policy starts monitoring your city's environmental data 24/7.</div></div>
+        <div class="step"><div class="step__num">04</div><div class="step__title">Trigger fires</div><div class="step__desc">A threshold is crossed — rainfall exceeds 40mm, AQI spikes past 350, a flood alert is issued.</div></div>
+        <div class="step"><div class="step__num">05</div><div class="step__title">Claim approved</div><div class="step__desc">Your claim is auto-approved instantly. No adjuster, no waiting, no paperwork.</div></div>
+        <div class="step"><div class="step__num">06</div><div class="step__title">Payout arrives</div><div class="step__desc">₹1,500 is credited to your Zepto wallet. You focus on your safety — we handle the rest.</div></div>
       </div>
     </div>
   </section>
 
   <!-- TRIGGERS -->
-  <section class="section">
+  <section class="section" style="background: var(--p50); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
     <div class="section__inner">
       <div class="section__header">
         <div class="section__eyebrow">Parametric triggers</div>
@@ -168,43 +144,19 @@
       </div>
       <div class="triggers-grid">
         <div class="trig">
-          <div class="trig__head">
-            <div class="trig__icon">🌧</div>
-            <div>
-              <div class="trig__name">Heavy Rainfall</div>
-              <div class="trig__cond">Rainfall &gt; 40 mm</div>
-            </div>
-          </div>
+          <div class="trig__head"><div class="trig__icon">🌧</div><div><div class="trig__name">Heavy Rainfall</div><div class="trig__cond">Rainfall &gt; 40 mm</div></div></div>
           <div class="trig__desc">Monsoon rains reduce delivery demand and make riding hazardous. ZeptoShield activates the moment your city's rainfall exceeds the safety threshold.</div>
         </div>
         <div class="trig">
-          <div class="trig__head">
-            <div class="trig__icon">🌡</div>
-            <div>
-              <div class="trig__name">Extreme Heat</div>
-              <div class="trig__cond">Temperature &gt; 42°C</div>
-            </div>
-          </div>
-          <div class="trig__desc">Heatwaves pose serious health risks for anyone working outdoors. When the mercury climbs past the threshold, your protection kicks in without any action from you.</div>
+          <div class="trig__head"><div class="trig__icon">🌡</div><div><div class="trig__name">Extreme Heat</div><div class="trig__cond">Temperature &gt; 42°C</div></div></div>
+          <div class="trig__desc">Heatwaves pose serious health risks for anyone working outdoors. When the mercury climbs past the threshold, your protection kicks in automatically.</div>
         </div>
         <div class="trig">
-          <div class="trig__head">
-            <div class="trig__icon">🏭</div>
-            <div>
-              <div class="trig__name">Severe Air Quality</div>
-              <div class="trig__cond">AQI &gt; 350</div>
-            </div>
-          </div>
+          <div class="trig__head"><div class="trig__icon">🏭</div><div><div class="trig__name">Severe Air Quality</div><div class="trig__cond">AQI &gt; 350</div></div></div>
           <div class="trig__desc">At AQI levels above 350, outdoor work becomes a serious health risk. Our system monitors real-time air quality data across all cities, continuously.</div>
         </div>
         <div class="trig">
-          <div class="trig__head">
-            <div class="trig__icon">🌊</div>
-            <div>
-              <div class="trig__name">Flood Warning</div>
-              <div class="trig__cond">Government alert issued</div>
-            </div>
-          </div>
+          <div class="trig__head"><div class="trig__icon">🌊</div><div><div class="trig__name">Flood Warning</div><div class="trig__cond">Government alert issued</div></div></div>
           <div class="trig__desc">When official flood alerts are issued, roads become inaccessible and deliveries impossible. We monitor government data feeds and trigger payouts the moment alerts go out.</div>
         </div>
       </div>
@@ -225,31 +177,22 @@
           <div class="pricing-card__price">₹20</div>
           <div class="pricing-card__period">per week</div>
           <div class="pricing-card__line"></div>
-          <div class="pricing-card__detail">
-            Cities with mild weather and infrequent disruptions — Jaipur, Surat, Lucknow and others.<br /><br />
-            Coverage up to <strong>₹1,500 / week</strong>
-          </div>
+          <div class="pricing-card__detail">Cities with mild weather and infrequent disruptions — Jaipur, Surat, Lucknow and others.<br /><br />Coverage up to <strong>₹1,500 / week</strong></div>
         </div>
         <div class="pricing-card pricing-card--featured">
           <div class="pricing-card__badge">Most common</div>
           <div class="pricing-card__risk risk--med">Medium Risk Zone</div>
           <div class="pricing-card__price">₹30</div>
           <div class="pricing-card__period">per week</div>
-          <div class="pricing-card__line"></div>
-          <div class="pricing-card__detail">
-            Cities with moderate monsoon impact and seasonal heat — Bengaluru, Delhi, Pune, Ahmedabad.<br /><br />
-            Coverage up to <strong>₹1,500 / week</strong>
-          </div>
+          <div class="pricing-card__line" style="background: rgba(255,255,255,0.15);"></div>
+          <div class="pricing-card__detail">Cities with moderate monsoon impact and seasonal heat — Bengaluru, Delhi, Pune, Ahmedabad.<br /><br />Coverage up to <strong>₹1,500 / week</strong></div>
         </div>
         <div class="pricing-card">
           <div class="pricing-card__risk risk--high">High Risk Zone</div>
           <div class="pricing-card__price">₹40</div>
           <div class="pricing-card__period">per week</div>
           <div class="pricing-card__line"></div>
-          <div class="pricing-card__detail">
-            High-disruption cities with frequent rain, extreme heat, and flood events — Mumbai, Chennai, Kolkata, Hyderabad.<br /><br />
-            Coverage up to <strong>₹1,500 / week</strong>
-          </div>
+          <div class="pricing-card__detail">High-disruption cities with frequent rain, extreme heat, and flood events — Mumbai, Chennai, Kolkata, Hyderabad.<br /><br />Coverage up to <strong>₹1,500 / week</strong></div>
         </div>
       </div>
     </div>
@@ -259,13 +202,10 @@
   <div class="cta-band">
     <div class="cta-band__inner">
       <h2 class="cta-band__title">Start protecting<br />your income <em>today.</em></h2>
-      <a class="btn btn--outline" href="pages/register.html" style="border-color: rgba(255,255,255,0.25); color: #fff; background: transparent;">
-        Register for free →
-      </a>
+      <a class="btn" href="pages/register.html" style="background:var(--white); color:var(--p700); font-weight:700; box-shadow:0 4px 16px rgba(0,0,0,0.15);">Register for free →</a>
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer__inner">
       <div class="footer__logo">Zepto<span>Shield</span></div>
@@ -273,6 +213,5 @@
     </div>
   </footer>
 </main>
-
 </body>
 </html>

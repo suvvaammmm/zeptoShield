@@ -4,7 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>How It Works — ZeptoShield</title>
-  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/theme.css" />
+  <style>
+    .trigger-table { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .trigger-table-head { display: grid; grid-template-columns: 2fr 1.2fr 1fr; padding: 12px 28px; background: var(--p50); border-bottom: 1px solid var(--border); }
+    .trigger-table-head div { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--p600); }
+    .trigger-table-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr; padding: 20px 28px; border-bottom: 1px solid var(--border); align-items: center; }
+    .trigger-table-row:last-child { border-bottom: none; }
+    .trigger-table-row:hover { background: var(--p50); }
+    .ttr-event { display: flex; gap: 12px; align-items: center; }
+    .ttr-icon { font-size: 1.4rem; }
+    .ttr-name { font-size: 0.9rem; font-weight: 600; color: var(--ink); }
+    .ttr-sub  { font-size: 0.75rem; color: var(--ink-faint); }
+    .ttr-thresh { font-size: 0.9rem; font-weight: 600; color: var(--p700); }
+    .auto-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--p100); color: var(--p700); border: 1px solid var(--p200);
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 4px 12px; border-radius: 100px;
+    }
+    .auto-tag::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--p500); }
+  </style>
 </head>
 <body>
 
@@ -22,11 +42,11 @@
 <main class="page fade-in">
 
   <!-- HEADER -->
-  <section class="section" style="padding-bottom: 0;">
+  <section class="section" style="padding-bottom:0;">
     <div class="section__inner">
       <div class="section__eyebrow">The process</div>
-      <h1 class="section__title" style="max-width: 600px;">From signup to<br />payout — <em>in seconds.</em></h1>
-      <p class="section__sub">ZeptoShield removes all friction from income protection. No manual claims, no waiting, no back-and-forth with assessors.</p>
+      <h1 class="section__title" style="max-width:600px;">From signup to<br/>payout — <em>in seconds.</em></h1>
+      <p class="section__sub" style="max-width:520px;">ZeptoShield removes all friction from income protection. No manual claims, no waiting, no back-and-forth with assessors.</p>
     </div>
   </section>
 
@@ -34,85 +54,47 @@
   <section class="section">
     <div class="section__inner">
       <div class="steps">
-        <div class="step">
-          <div class="step__num">01</div>
-          <div class="step__title">Register your profile</div>
-          <div class="step__desc">Enter your name, phone number, and city. Your account is created instantly. No documents needed, no identity verification delays.</div>
-        </div>
-        <div class="step">
-          <div class="step__num">02</div>
-          <div class="step__title">AI risk assessment</div>
-          <div class="step__desc">Our system analyses your city's historical weather patterns, flood records, and pollution data to assign a risk profile — Low, Medium, or High.</div>
-        </div>
-        <div class="step">
-          <div class="step__num">03</div>
-          <div class="step__title">Review your premium</div>
-          <div class="step__desc">Your weekly premium is shown upfront — ₹20, ₹30, or ₹40 — based purely on your city's risk level. No hidden fees, no variable pricing.</div>
-        </div>
-        <div class="step">
-          <div class="step__num">04</div>
-          <div class="step__title">Activate with one tap</div>
-          <div class="step__desc">Confirm your policy in a single click. Coverage starts immediately and begins monitoring your city's environmental data around the clock.</div>
-        </div>
-        <div class="step">
-          <div class="step__num">05</div>
-          <div class="step__title">Continuous monitoring</div>
-          <div class="step__desc">ZeptoShield tracks weather APIs, real-time AQI feeds, and government flood alert systems for your city — 24 hours a day, 7 days a week.</div>
-        </div>
-        <div class="step">
-          <div class="step__num">06</div>
-          <div class="step__title">Instant automatic payout</div>
-          <div class="step__desc">When a trigger threshold is crossed, your claim is auto-approved and ₹1,500 is credited to your Zepto wallet. No action required on your part.</div>
-        </div>
+        <div class="step"><div class="step__num">01</div><div class="step__title">Register your profile</div><div class="step__desc">Enter your name, phone number, and city. Your account is created instantly. No documents needed, no identity verification delays.</div></div>
+        <div class="step"><div class="step__num">02</div><div class="step__title">AI risk assessment</div><div class="step__desc">Our system analyses your city's historical weather patterns, flood records, and pollution data to assign a risk profile — Low, Medium, or High.</div></div>
+        <div class="step"><div class="step__num">03</div><div class="step__title">Review your premium</div><div class="step__desc">Your weekly premium is shown upfront — ₹20, ₹30, or ₹40 — based purely on your city's risk level. No hidden fees, no variable pricing.</div></div>
+        <div class="step"><div class="step__num">04</div><div class="step__title">Activate with one tap</div><div class="step__desc">Confirm your policy in a single click. Coverage starts immediately and begins monitoring your city's environmental data around the clock.</div></div>
+        <div class="step"><div class="step__num">05</div><div class="step__title">Continuous monitoring</div><div class="step__desc">ZeptoShield tracks weather APIs, real-time AQI feeds, and government flood alert systems for your city — 24 hours a day, 7 days a week.</div></div>
+        <div class="step"><div class="step__num">06</div><div class="step__title">Instant automatic payout</div><div class="step__desc">When a trigger threshold is crossed, your claim is auto-approved and ₹1,500 is credited to your Zepto wallet. No action required on your part.</div></div>
       </div>
     </div>
   </section>
 
   <!-- TRIGGERS TABLE -->
-  <section class="section">
+  <section class="section" style="background:var(--p50);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
     <div class="section__inner">
       <div class="section__header">
         <div class="section__eyebrow">Trigger thresholds</div>
-        <h2 class="section__title">Objective data.<br /><em>No discretion.</em></h2>
+        <h2 class="section__title">Objective data.<br/><em>No discretion.</em></h2>
         <p class="section__sub">Every payout is governed by a pre-set threshold. Either the data crosses the line or it doesn't — there's no assessor making a judgement call.</p>
       </div>
-      <div style="background: var(--white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;">
-        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 14px 28px; background: var(--surface); border-bottom: 1px solid var(--border);">
-          <div style="font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint);">Event</div>
-          <div style="font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint);">Threshold</div>
-          <div style="font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint);">Trigger type</div>
+      <div class="trigger-table">
+        <div class="trigger-table-head">
+          <div>Event</div><div>Threshold</div><div>Trigger type</div>
         </div>
-        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 20px 28px; border-bottom: 1px solid var(--border); align-items: center;">
-          <div style="display:flex; gap:12px; align-items:center;">
-            <div class="trigger-row__icon">🌧</div>
-            <div><div style="font-size:0.9rem; font-weight:500;">Heavy Rainfall</div><div style="font-size:0.78rem; color:var(--ink-faint);">Monsoon disruption</div></div>
-          </div>
-          <div style="font-size:0.9rem; font-weight:500;">Rainfall &gt; 40 mm</div>
-          <div><span class="trigger-row__tag">Automatic</span></div>
+        <div class="trigger-table-row">
+          <div class="ttr-event"><div class="ttr-icon">🌧</div><div><div class="ttr-name">Heavy Rainfall</div><div class="ttr-sub">Monsoon disruption</div></div></div>
+          <div class="ttr-thresh">Rainfall &gt; 40 mm</div>
+          <div><span class="auto-tag">Automatic</span></div>
         </div>
-        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 20px 28px; border-bottom: 1px solid var(--border); align-items: center;">
-          <div style="display:flex; gap:12px; align-items:center;">
-            <div class="trigger-row__icon">🌡</div>
-            <div><div style="font-size:0.9rem; font-weight:500;">Extreme Heat</div><div style="font-size:0.78rem; color:var(--ink-faint);">Heatwave event</div></div>
-          </div>
-          <div style="font-size:0.9rem; font-weight:500;">Temp &gt; 42°C</div>
-          <div><span class="trigger-row__tag">Automatic</span></div>
+        <div class="trigger-table-row">
+          <div class="ttr-event"><div class="ttr-icon">🌡</div><div><div class="ttr-name">Extreme Heat</div><div class="ttr-sub">Heatwave event</div></div></div>
+          <div class="ttr-thresh">Temp &gt; 42°C</div>
+          <div><span class="auto-tag">Automatic</span></div>
         </div>
-        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 20px 28px; border-bottom: 1px solid var(--border); align-items: center;">
-          <div style="display:flex; gap:12px; align-items:center;">
-            <div class="trigger-row__icon">🏭</div>
-            <div><div style="font-size:0.9rem; font-weight:500;">Severe Air Pollution</div><div style="font-size:0.78rem; color:var(--ink-faint);">Hazardous AQI levels</div></div>
-          </div>
-          <div style="font-size:0.9rem; font-weight:500;">AQI &gt; 350</div>
-          <div><span class="trigger-row__tag">Automatic</span></div>
+        <div class="trigger-table-row">
+          <div class="ttr-event"><div class="ttr-icon">🏭</div><div><div class="ttr-name">Severe Air Pollution</div><div class="ttr-sub">Hazardous AQI levels</div></div></div>
+          <div class="ttr-thresh">AQI &gt; 350</div>
+          <div><span class="auto-tag">Automatic</span></div>
         </div>
-        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 20px 28px; align-items: center;">
-          <div style="display:flex; gap:12px; align-items:center;">
-            <div class="trigger-row__icon">🌊</div>
-            <div><div style="font-size:0.9rem; font-weight:500;">Flood Warning</div><div style="font-size:0.78rem; color:var(--ink-faint);">Government issued alert</div></div>
-          </div>
-          <div style="font-size:0.9rem; font-weight:500;">Any active alert</div>
-          <div><span class="trigger-row__tag">Automatic</span></div>
+        <div class="trigger-table-row">
+          <div class="ttr-event"><div class="ttr-icon">🌊</div><div><div class="ttr-name">Flood Warning</div><div class="ttr-sub">Government issued alert</div></div></div>
+          <div class="ttr-thresh">Any active alert</div>
+          <div><span class="auto-tag">Automatic</span></div>
         </div>
       </div>
     </div>
@@ -121,8 +103,8 @@
   <!-- CTA -->
   <div class="cta-band">
     <div class="cta-band__inner">
-      <h2 class="cta-band__title">Ready to get<br /><em>protected?</em></h2>
-      <a class="btn" href="register.html" style="background: var(--white); color: var(--ink);">Register now →</a>
+      <h2 class="cta-band__title">Ready to get<br/><em>protected?</em></h2>
+      <a class="btn" href="register.html" style="background:var(--white);color:var(--p700);font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,0.15);">Register now →</a>
     </div>
   </div>
 
@@ -132,7 +114,6 @@
       <div class="footer__copy">A proposed Zepto partner benefit · © 2026</div>
     </div>
   </footer>
-
 </main>
 </body>
 </html>
