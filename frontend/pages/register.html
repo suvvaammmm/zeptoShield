@@ -63,6 +63,12 @@
     .input-prefix-wrap .prefix { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--ink-soft); font-size: 0.9rem; pointer-events: none; font-weight: 500; z-index:2; }
     .input-prefix-wrap .prefix-div { position: absolute; left: 44px; top: 50%; transform: translateY(-50%); height: 20px; width: 1px; background: var(--border); }
     .input-prefix-wrap .form-input { padding-left: 58px; }
+
+    /* Hours badge */
+    .hours-badge { background: var(--p50); border: 1px solid var(--p200); border-radius: var(--radius-sm); padding: 12px 14px; }
+    .hours-badge__label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--p600); margin-bottom: 2px; }
+    .hours-badge__val { font-size: 1.4rem; font-family: var(--serif); color: var(--p800); letter-spacing: -0.02em; line-height: 1.2; }
+    .hours-badge__sub { font-size: 0.72rem; color: var(--ink-faint); margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -121,6 +127,30 @@
           <div class="form-group">
             <label class="form-label" for="inp-earnings">Weekly earnings (₹)</label>
             <input class="form-input" id="inp-earnings" type="number" placeholder="6000" value="6000" min="1000" max="50000" inputmode="numeric" onchange="updatePremiumPreview()" />
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top:4px;">
+          <div class="form-group">
+            <label class="form-label" for="inp-hours">Approx. hours worked / week</label>
+            <div class="select-wrap">
+              <select class="form-select" id="inp-hours" onchange="updatePremiumPreview()">
+                <option value="">Select range</option>
+                <option value="20">Less than 20 hrs</option>
+                <option value="30">20 – 30 hrs</option>
+                <option value="40" selected>30 – 40 hrs (full-time)</option>
+                <option value="50">40 – 50 hrs</option>
+                <option value="60">50 – 60 hrs</option>
+                <option value="70">60+ hrs (extended)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="display:flex;flex-direction:column;justify-content:flex-end;">
+            <div class="hours-badge" id="hours-badge" style="display:none;">
+              <div class="hours-badge__label">Exposure factor</div>
+              <div class="hours-badge__val" id="hours-badge-val">—</div>
+              <div class="hours-badge__sub" id="hours-badge-sub"></div>
+            </div>
           </div>
         </div>
 
@@ -186,11 +216,13 @@ const CITY_RISK = {
   Visakhapatnam:{rain:1100,temp:40,aqi:90,flood:1.2},Coimbatore:{rain:700,temp:36,aqi:80,flood:0.4},
 };
 
-function calcPremium(city, weeklyEarnings=6000) {
+function calcPremium(city, weeklyEarnings=6000, weeklyHours=40) {
   const cf = CITY_RISK[city] || {rain:900,temp:40,aqi:120,flood:0.8};
   const rainS=Math.min(cf.rain/2400,1), tempS=Math.max((cf.temp-30)/20,0), aqiS=Math.min(cf.aqi/350,1), floodS=Math.min(cf.flood/4,1);
   const overall=rainS*0.30+tempS*0.20+aqiS*0.15+floodS*0.35;
-  const premium=Math.round(20+overall*30+(weeklyEarnings/12000)*10);
+  // Exposure factor: more hours on road = slightly higher premium
+  const exposureMult = 0.85 + (weeklyHours / 280); // 0.92 @ 20hrs → 1.10 @ 70hrs
+  const premium=Math.round((20+overall*30+(weeklyEarnings/12000)*10)*exposureMult);
   const tier=overall>=0.6?"high":overall>=0.35?"medium":"low";
   return { premium, tier, breakdown:{"Rainfall risk":+(rainS*100).toFixed(1),"Temperature risk":+(tempS*100).toFixed(1),"AQI risk":+(aqiS*100).toFixed(1),"Flood risk":+(floodS*100).toFixed(1)} };
 }
@@ -198,8 +230,20 @@ function calcPremium(city, weeklyEarnings=6000) {
 function updatePremiumPreview() {
   const city=document.getElementById("inp-city").value;
   const earnings=parseFloat(document.getElementById("inp-earnings").value)||6000;
+  const hoursVal=parseInt(document.getElementById("inp-hours").value)||40;
+  // Update hours badge
+  const badge=document.getElementById("hours-badge");
+  const badgeVal=document.getElementById("hours-badge-val");
+  const badgeSub=document.getElementById("hours-badge-sub");
+  if (hoursVal) {
+    badge.style.display="block";
+    const expPct=Math.round((0.85+(hoursVal/280))*100);
+    const expLabel=hoursVal<=20?"Low exposure":hoursVal<=40?"Moderate":hoursVal<=55?"High":"Very high";
+    badgeVal.textContent=`${expPct}% · ${expLabel}`;
+    badgeSub.textContent=`≈ ${hoursVal} hrs/week on road`;
+  }
   if (!city) return;
-  const {premium,tier,breakdown}=calcPremium(city,earnings);
+  const {premium,tier,breakdown}=calcPremium(city,earnings,hoursVal);
   document.getElementById("prev-premium").textContent=premium;
   const labels={high:"🔴 High risk",medium:"🟡 Medium risk",low:"🟢 Low risk"};
   document.getElementById("prev-tier-badge").innerHTML=`<span class="tier-badge tier-badge--${tier}">${labels[tier]}</span>`;

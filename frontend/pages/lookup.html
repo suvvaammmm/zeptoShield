@@ -6,20 +6,87 @@
   <title>My Policy — ZeptoShield</title>
   <link rel="stylesheet" href="../css/theme.css" />
   <style>
-    .lookup-result {
-      padding-top: 24px; border-top: 1px solid var(--border); margin-top: 24px;
-      animation: fadein 0.3s ease;
-    }
     @keyframes fadein { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
-    .lookup-result__name { font-family: var(--serif); font-size: 1.6rem; color: var(--ink); margin-bottom: 4px; letter-spacing: -0.02em; }
-    .lookup-result__sub { font-size: 0.82rem; color: var(--ink-faint); margin-bottom: 20px; }
-    .lookup-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
-    .lookup-field__label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--p600); margin-bottom: 4px; }
-    .lookup-field__val { font-size: 0.95rem; color: var(--ink); font-weight: 500; }
+    .step { display:none; animation: fadein 0.35s ease; }
+    .step.active { display:block; }
 
-    .lf-card {
-      background: var(--p50); border: 1px solid var(--p200); border-radius: var(--radius-sm); padding: 14px 16px;
+    /* OTP */
+    .otp-hint { font-size:0.8rem; color:var(--ink-faint); margin-bottom:20px; line-height:1.5; }
+    .otp-hint strong { color:var(--ink-soft); }
+    .otp-row { display:flex; gap:10px; justify-content:center; margin-bottom:20px; }
+    .otp-digit {
+      width:54px; height:60px; text-align:center; font-size:1.6rem; font-weight:700;
+      font-family:var(--serif); color:var(--ink);
+      border:2px solid var(--border); border-radius:var(--radius-sm);
+      background:var(--surface); outline:none; transition:border-color 0.15s;
     }
+    .otp-digit:focus { border-color:var(--p500); background:#fff; box-shadow:0 0 0 3px rgba(139,92,246,0.12); }
+    .otp-digit.filled { border-color:var(--p400); background:var(--p50); }
+    .otp-resend { font-size:0.8rem; color:var(--ink-faint); text-align:center; margin-bottom:16px; }
+    .otp-resend a { color:var(--p600); cursor:pointer; font-weight:500; }
+    .otp-timer { font-variant-numeric:tabular-nums; }
+    .otp-error { background:#fef2f2; border:1px solid #fecaca; border-radius:var(--radius-sm); padding:10px 14px; font-size:0.82rem; color:var(--error); margin-bottom:12px; display:none; }
+    .otp-error.visible { display:block; }
+
+    /* Policy card */
+    .policy-card {
+      background:linear-gradient(135deg,var(--p900),var(--p700));
+      border-radius:16px; padding:28px 24px 24px; color:#fff;
+      margin-bottom:24px; position:relative; overflow:hidden;
+    }
+    .policy-card::before {
+      content:''; position:absolute; top:-40px; right:-40px;
+      width:160px; height:160px; border-radius:50%;
+      background:rgba(255,255,255,0.06); pointer-events:none;
+    }
+    .policy-card__badge {
+      display:inline-flex; align-items:center; gap:6px;
+      background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2);
+      border-radius:99px; font-size:0.7rem; font-weight:700;
+      letter-spacing:0.06em; text-transform:uppercase;
+      padding:4px 12px; color:#e0d7ff; margin-bottom:20px;
+    }
+    .badge-dot { width:6px; height:6px; border-radius:50%; background:#6ee7b7; display:inline-block; }
+    .policy-card__id-label { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.55); margin-bottom:4px; }
+    .policy-card__id { font-family:var(--serif); font-size:1.05rem; letter-spacing:0.04em; color:#fff; margin-bottom:20px; word-break:break-all; }
+    .policy-card__name { font-family:var(--serif); font-size:1.7rem; letter-spacing:-0.02em; color:#fff; margin-bottom:4px; }
+    .policy-card__city { font-size:0.82rem; color:rgba(255,255,255,0.6); margin-bottom:20px; }
+    .policy-card__grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .policy-card__stat-label { font-size:0.65rem; text-transform:uppercase; letter-spacing:0.07em; color:rgba(255,255,255,0.5); margin-bottom:2px; }
+    .policy-card__stat-val { font-size:1.05rem; font-weight:600; color:#fff; }
+
+    /* Coverage */
+    .section-head { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--p600); margin:24px 0 12px; }
+    .coverage-list { display:flex; flex-direction:column; gap:10px; margin-bottom:8px; }
+    .cov-item {
+      display:flex; align-items:flex-start; gap:12px;
+      background:var(--p50); border:1px solid var(--p200);
+      border-radius:var(--radius-sm); padding:14px 16px;
+    }
+    .cov-item__icon { font-size:1.25rem; flex-shrink:0; margin-top:1px; }
+    .cov-item__title { font-size:0.875rem; font-weight:600; color:var(--ink); margin-bottom:2px; }
+    .cov-item__desc { font-size:0.77rem; color:var(--ink-faint); line-height:1.5; }
+    .cov-item__amount { font-size:0.82rem; font-weight:700; color:var(--p700); margin-top:4px; }
+
+    /* Premium breakdown */
+    .prem-card {
+      background:#fff; border:1.5px solid var(--p300);
+      border-radius:var(--radius-sm); padding:20px; margin-bottom:24px;
+    }
+    .prem-card__row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid var(--border); font-size:0.85rem; }
+    .prem-card__row:last-child { border-bottom:none; padding-top:12px; margin-top:4px; }
+    .prem-card__row:last-child .prem-key { font-weight:700; color:var(--ink); font-size:0.95rem; }
+    .prem-card__row:last-child .prem-val { font-weight:800; color:var(--p700); font-size:1.25rem; font-family:var(--serif); }
+    .prem-key { color:var(--ink-soft); }
+    .prem-val { font-weight:600; color:var(--ink); }
+
+    /* Action row */
+    .action-row { display:flex; gap:10px; margin-top:8px; }
+    .action-row .btn { flex:1; }
+
+    /* Back link */
+    .back-link { display:inline-flex; align-items:center; gap:6px; font-size:0.82rem; color:var(--p600); cursor:pointer; margin-bottom:20px; background:none; border:none; font-family:var(--sans); padding:0; }
+    .back-link:hover { text-decoration:underline; }
   </style>
 </head>
 <body>
@@ -37,35 +104,148 @@
 
 <main class="page fade-in">
   <div class="form-wrap">
-    <div class="eyebrow-pill">My account</div>
-    <h1 class="form-page__title">Find your policy.</h1>
-    <p class="form-page__sub">New here? <a onclick="location.href='register.html'">Register first →</a></p>
 
-    <div class="form-card">
-      <div class="form-group">
-        <label class="form-label" for="phone">Mobile number</label>
-        <div style="position:relative;">
-          <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:0.9rem;font-weight:500;pointer-events:none;z-index:2;">+91</span>
-          <div style="position:absolute;left:44px;top:50%;transform:translateY(-50%);height:18px;width:1px;background:var(--border);"></div>
-          <input class="form-input" id="phone" type="tel" placeholder="9876543210" maxlength="10" inputmode="numeric" style="padding-left:58px;" />
-        </div>
-      </div>
-      <button class="btn btn--primary btn--full" id="lookup-btn">Find my account →</button>
-
-      <div id="result" style="display:none;">
-        <div class="lookup-result">
-          <div class="lookup-result__name" id="r-name"></div>
-          <div class="lookup-result__sub" id="r-sub"></div>
-          <div class="lookup-grid">
-            <div class="lf-card"><div class="lookup-field__label">Risk zone</div><div class="lookup-field__val" id="r-risk"></div></div>
-            <div class="lf-card"><div class="lookup-field__label">Weekly premium</div><div class="lookup-field__val" id="r-prem"></div></div>
-            <div class="lf-card"><div class="lookup-field__label">Policy status</div><div class="lookup-field__val" id="r-status"></div></div>
-            <div class="lf-card"><div class="lookup-field__label">Total claims</div><div class="lookup-field__val" id="r-claims"></div></div>
+    <!-- STEP 1: Phone -->
+    <div class="step active" id="step-phone">
+      <div class="eyebrow-pill">My account</div>
+      <h1 class="form-page__title">Find your policy.</h1>
+      <p class="form-page__sub">New here? <a onclick="location.href='register.html'">Register first →</a></p>
+      <div class="form-card">
+        <div class="form-group">
+          <label class="form-label" for="phone">Mobile number</label>
+          <div style="position:relative;">
+            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:0.9rem;font-weight:500;pointer-events:none;z-index:2;">+91</span>
+            <div style="position:absolute;left:44px;top:50%;transform:translateY(-50%);height:18px;width:1px;background:var(--border);"></div>
+            <input class="form-input" id="phone" type="tel" placeholder="9876543210" maxlength="10" inputmode="numeric" style="padding-left:58px;" />
           </div>
-          <button class="btn btn--primary btn--full" id="go-dash-btn">Go to dashboard →</button>
         </div>
+        <div class="field-error" id="phone-err"></div>
+        <button class="btn btn--primary btn--full" id="lookup-btn">Find my account →</button>
       </div>
     </div>
+
+    <!-- STEP 2: OTP -->
+    <div class="step" id="step-otp">
+      <button class="back-link" onclick="goBack('step-phone')">← Back</button>
+      <div class="eyebrow-pill">Verify identity</div>
+      <h1 class="form-page__title">Enter the OTP.</h1>
+      <div class="form-card">
+        <p class="otp-hint">A 6-digit code was sent to <strong id="otp-phone-display">+91 XXXXXXXXXX</strong>. Enter it below to view your policy.</p>
+        <div class="otp-row" id="otp-row">
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" />
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        </div>
+        <div class="otp-error" id="otp-err">Incorrect OTP. Please try again.</div>
+        <div class="otp-resend">
+          Didn't receive it?
+          <span id="resend-timer-wrap"> Resend in <span class="otp-timer" id="resend-timer">30</span>s</span>
+          <span id="resend-link-wrap" style="display:none;"><a id="resend-link" onclick="resendOTP()">Resend OTP</a></span>
+        </div>
+        <button class="btn btn--primary btn--full" id="verify-btn">Verify &amp; View Policy →</button>
+        <p style="font-size:0.72rem;color:var(--ink-faint);text-align:center;margin-top:10px;">
+          Demo OTP: <strong id="demo-otp-hint" style="color:var(--p700);font-family:var(--serif);letter-spacing:0.12em;">——————</strong>
+        </p>
+      </div>
+    </div>
+
+    <!-- STEP 3: Policy details -->
+    <div class="step" id="step-policy">
+      <button class="back-link" onclick="goBack('step-phone')">← Look up another number</button>
+      <div class="eyebrow-pill">🛡 Your policy</div>
+      <h1 class="form-page__title" style="margin-bottom:20px;">Policy details.</h1>
+
+      <div class="policy-card">
+        <div class="policy-card__badge">
+          <span class="badge-dot"></span>
+          <span id="pc-status-label">Active Policy</span>
+        </div>
+        <div class="policy-card__id-label">Policy ID</div>
+        <div class="policy-card__id" id="pc-id">ZS-2026-XXXXXX</div>
+        <div class="policy-card__name" id="pc-name">—</div>
+        <div class="policy-card__city" id="pc-city">—</div>
+        <div class="policy-card__grid">
+          <div>
+            <div class="policy-card__stat-label">Risk Zone</div>
+            <div class="policy-card__stat-val" id="pc-risk">—</div>
+          </div>
+          <div>
+            <div class="policy-card__stat-label">Policy Since</div>
+            <div class="policy-card__stat-val" id="pc-since">—</div>
+          </div>
+          <div>
+            <div class="policy-card__stat-label">Total Claims</div>
+            <div class="policy-card__stat-val" id="pc-claims">—</div>
+          </div>
+          <div>
+            <div class="policy-card__stat-label">Status</div>
+            <div class="policy-card__stat-val" id="pc-status-val">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head">What's covered</div>
+      <div class="coverage-list">
+        <div class="cov-item">
+          <div class="cov-item__icon">🌧️</div>
+          <div>
+            <div class="cov-item__title">Extreme Weather Disruption</div>
+            <div class="cov-item__desc">Triggered automatically when official storm/rain alerts are raised for 3+ hours in your city on a single day.</div>
+            <div class="cov-item__amount">₹1,500 per qualifying week</div>
+          </div>
+        </div>
+        <div class="cov-item">
+          <div class="cov-item__icon">🌡️</div>
+          <div>
+            <div class="cov-item__title">Heat-Wave Income Loss</div>
+            <div class="cov-item__desc">Covers loss of earning when a heat-wave advisory is active and city temperature exceeds 42 °C for 2+ consecutive days.</div>
+            <div class="cov-item__amount">₹750 per qualifying week</div>
+          </div>
+        </div>
+        <div class="cov-item">
+          <div class="cov-item__icon">🌫️</div>
+          <div>
+            <div class="cov-item__title">Hazardous AQI</div>
+            <div class="cov-item__desc">Activated when city AQI exceeds 300 (Hazardous) for 48+ continuous hours, restricting safe outdoor delivery work.</div>
+            <div class="cov-item__amount">₹500 per qualifying week</div>
+          </div>
+        </div>
+        <div class="cov-item">
+          <div class="cov-item__icon">🌊</div>
+          <div>
+            <div class="cov-item__title">Flood &amp; Waterlogging</div>
+            <div class="cov-item__desc">Payout when flood alerts or waterlogging cover 3+ city zones, making road-based delivery unsafe or impossible.</div>
+            <div class="cov-item__amount">₹1,000 per qualifying week</div>
+          </div>
+        </div>
+        <div class="cov-item">
+          <div class="cov-item__icon">🏥</div>
+          <div>
+            <div class="cov-item__title">Accident / Hospitalisation</div>
+            <div class="cov-item__desc">Emergency one-time payout if a delivery-related accident leads to 24+ hours of hospitalisation. Submit via dashboard.</div>
+            <div class="cov-item__amount">Up to ₹5,000 one-time</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head">Weekly premium breakdown</div>
+      <div class="prem-card">
+        <div class="prem-card__row"><span class="prem-key">Base premium</span><span class="prem-val" id="pb-base">₹20</span></div>
+        <div class="prem-card__row"><span class="prem-key">City risk loading</span><span class="prem-val" id="pb-city">—</span></div>
+        <div class="prem-card__row"><span class="prem-key">Earnings adjustment</span><span class="prem-val" id="pb-earn">—</span></div>
+        <div class="prem-card__row"><span class="prem-key">Risk tier</span><span class="prem-val" id="pb-tier">—</span></div>
+        <div class="prem-card__row"><span class="prem-key">Total weekly premium</span><span class="prem-val" id="pb-total">—</span></div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn--primary" id="go-dash-btn">Go to dashboard →</button>
+        <button class="btn" style="background:var(--p50);color:var(--p700);border:1.5px solid var(--p300);" onclick="goBack('step-phone')">Look up another</button>
+      </div>
+    </div>
+
   </div>
 
   <footer class="footer">
@@ -79,38 +259,163 @@
 <script src="../js/api.js"></script>
 <script src="../js/app.js"></script>
 <script>
-  let foundPhone = "";
+let foundPhone = "";
+let foundData  = null;
+let generatedOTP = "";
+let resendInterval = null;
 
-  document.getElementById("lookup-btn").addEventListener("click", async () => {
-    const phone = document.getElementById("phone").value.trim();
-    if (phone.length < 10) {
-      Toast.show({ type: "error", title: "Invalid number", sub: "Enter your 10-digit mobile number." });
-      return;
-    }
-    const btn = document.getElementById("lookup-btn");
-    btn.disabled = true; btn.textContent = "Searching…";
-    const data = await ZS.api("GET", `/workers/${phone}`);
-    btn.disabled = false; btn.textContent = "Find my account →";
-    if (data.error) {
-      Toast.show({ type: "error", title: "Not found", sub: "No account found. Register first." });
-      document.getElementById("result").style.display = "none";
-      return;
-    }
-    foundPhone = phone;
-    const { worker, policy, claims } = data;
-    document.getElementById("r-name").textContent = worker.name;
-    document.getElementById("r-sub").textContent = `${worker.city} · Delivery Partner`;
-    document.getElementById("r-risk").textContent = worker.riskScore.charAt(0).toUpperCase() + worker.riskScore.slice(1);
-    document.getElementById("r-prem").textContent = `₹${worker.premium} / week`;
-    document.getElementById("r-status").textContent = policy ? "Active ✓" : "Not activated";
-    document.getElementById("r-status").style.color = policy ? "var(--success)" : "var(--warn)";
-    document.getElementById("r-claims").textContent = `${claims.length} claim${claims.length !== 1 ? "s" : ""}`;
-    document.getElementById("result").style.display = "block";
-  });
+function showStep(id) {
+  document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+function goBack(stepId) {
+  clearInterval(resendInterval);
+  showStep(stepId);
+}
 
-  document.getElementById("go-dash-btn").addEventListener("click", () => {
-    location.href = `dashboard.html?phone=${foundPhone}`;
-  });
+/* ── STEP 1 ── */
+document.getElementById("lookup-btn").addEventListener("click", async () => {
+  const phone = document.getElementById("phone").value.trim();
+  const errEl = document.getElementById("phone-err");
+  errEl.classList.remove("visible");
+  if (!/^\d{10}$/.test(phone)) {
+    errEl.textContent = "Enter a valid 10-digit mobile number.";
+    errEl.classList.add("visible");
+    return;
+  }
+  const btn = document.getElementById("lookup-btn");
+  btn.disabled = true; btn.textContent = "Searching…";
+  const data = await ZS.api("GET", `/workers/${phone}`);
+  btn.disabled = false; btn.textContent = "Find my account →";
+  if (data.error) {
+    errEl.textContent = "No account found with this number. Register first.";
+    errEl.classList.add("visible");
+    return;
+  }
+  foundPhone = phone;
+  foundData  = data;
+  generatedOTP = String(Math.floor(100000 + Math.random() * 900000));
+  document.getElementById("otp-phone-display").textContent = "+91 " + phone.replace(/(\d{5})(\d{5})/, "$1 $2");
+  document.getElementById("demo-otp-hint").textContent = generatedOTP;
+  clearOTPInputs();
+  startResendTimer();
+  showStep("step-otp");
+  document.querySelectorAll(".otp-digit")[0].focus();
+});
+
+/* ── STEP 2 OTP ── */
+const digits = () => Array.from(document.querySelectorAll(".otp-digit"));
+function clearOTPInputs() {
+  digits().forEach(d => { d.value=""; d.classList.remove("filled"); });
+  document.getElementById("otp-err").classList.remove("visible");
+}
+document.getElementById("otp-row").addEventListener("input", e => {
+  const el = e.target;
+  if (!el.classList.contains("otp-digit")) return;
+  const val = el.value.replace(/\D/g,"").slice(-1);
+  el.value = val;
+  el.classList.toggle("filled", !!val);
+  if (val) {
+    const next = el.nextElementSibling;
+    if (next && next.classList.contains("otp-digit")) next.focus();
+    else setTimeout(tryAutoVerify, 120);
+  }
+});
+document.getElementById("otp-row").addEventListener("keydown", e => {
+  if (e.key === "Backspace" && !e.target.value) {
+    const prev = e.target.previousElementSibling;
+    if (prev && prev.classList.contains("otp-digit")) { prev.value=""; prev.classList.remove("filled"); prev.focus(); }
+  }
+});
+function tryAutoVerify() {
+  if (digits().every(d => d.value)) verifyOTP();
+}
+document.getElementById("verify-btn").addEventListener("click", verifyOTP);
+function verifyOTP() {
+  const code = digits().map(d => d.value).join("");
+  const errEl = document.getElementById("otp-err");
+  errEl.classList.remove("visible");
+  if (code.length < 6) { errEl.textContent="Please enter all 6 digits."; errEl.classList.add("visible"); return; }
+  if (code !== generatedOTP) {
+    errEl.textContent="Incorrect OTP. Please check and try again."; errEl.classList.add("visible");
+    digits().forEach(d=>{d.value="";d.classList.remove("filled");}); digits()[0].focus(); return;
+  }
+  clearInterval(resendInterval);
+  populatePolicyPage(foundData, foundPhone);
+  showStep("step-policy");
+}
+function startResendTimer() {
+  let secs = 30;
+  document.getElementById("resend-timer").textContent = secs;
+  document.getElementById("resend-timer-wrap").style.display="inline";
+  document.getElementById("resend-link-wrap").style.display="none";
+  clearInterval(resendInterval);
+  resendInterval = setInterval(()=>{
+    secs--;
+    document.getElementById("resend-timer").textContent = secs;
+    if (secs <= 0) {
+      clearInterval(resendInterval);
+      document.getElementById("resend-timer-wrap").style.display="none";
+      document.getElementById("resend-link-wrap").style.display="inline";
+    }
+  }, 1000);
+}
+function resendOTP() {
+  generatedOTP = String(Math.floor(100000 + Math.random() * 900000));
+  document.getElementById("demo-otp-hint").textContent = generatedOTP;
+  clearOTPInputs();
+  startResendTimer();
+  digits()[0].focus();
+}
+
+/* ── STEP 3 ── */
+const CITY_RISK = {
+  Mumbai:{rain:2400,temp:38,aqi:145,flood:3.2},Chennai:{rain:1400,temp:42,aqi:120,flood:2.1},
+  Kolkata:{rain:1800,temp:40,aqi:180,flood:2.8},Hyderabad:{rain:900,temp:42,aqi:130,flood:1.5},
+  Bengaluru:{rain:970,temp:35,aqi:95,flood:0.8},Delhi:{rain:750,temp:45,aqi:280,flood:0.5},
+  Pune:{rain:720,temp:38,aqi:85,flood:0.6},Ahmedabad:{rain:800,temp:46,aqi:150,flood:0.4},
+  Jaipur:{rain:550,temp:46,aqi:170,flood:0.2},Surat:{rain:1200,temp:38,aqi:130,flood:1.0},
+  Lucknow:{rain:900,temp:44,aqi:200,flood:0.6},Bhubaneswar:{rain:1500,temp:40,aqi:100,flood:1.8},
+  Nagpur:{rain:1100,temp:47,aqi:110,flood:0.7},Indore:{rain:950,temp:43,aqi:120,flood:0.5},
+  Visakhapatnam:{rain:1100,temp:40,aqi:90,flood:1.2},Coimbatore:{rain:700,temp:36,aqi:80,flood:0.4},
+};
+function calcPremiumBreakdown(city, weeklyEarnings) {
+  const cf = CITY_RISK[city] || {rain:900,temp:40,aqi:120,flood:0.8};
+  const rainS=Math.min(cf.rain/2400,1),tempS=Math.max((cf.temp-30)/20,0),aqiS=Math.min(cf.aqi/350,1),floodS=Math.min(cf.flood/4,1);
+  const overall=rainS*0.30+tempS*0.20+aqiS*0.15+floodS*0.35;
+  const cityLoad=Math.round(overall*30), earnAdj=Math.round((weeklyEarnings/12000)*10);
+  const total=20+cityLoad+earnAdj;
+  const tier=overall>=0.6?"🔴 High":overall>=0.35?"🟡 Medium":"🟢 Low";
+  return {base:20,cityLoad,earnAdj,total,tier};
+}
+function generatePolicyId(phone) {
+  const seed=parseInt(phone.slice(-6));
+  const hex=((seed*31337)%0xFFFFFF).toString(16).toUpperCase().padStart(6,"0");
+  return "ZS-2026-"+hex;
+}
+function populatePolicyPage(data, phone) {
+  const {worker,policy,claims}=data;
+  document.getElementById("pc-id").textContent = generatePolicyId(phone);
+  document.getElementById("pc-name").textContent = worker.name;
+  document.getElementById("pc-city").textContent = worker.city + " · Delivery Partner";
+  const risk = worker.riskScore ? (worker.riskScore.charAt(0).toUpperCase()+worker.riskScore.slice(1)) : "Medium";
+  document.getElementById("pc-risk").textContent = risk;
+  document.getElementById("pc-claims").textContent = (claims?.length||0)+" claim"+((claims?.length||0)!==1?"s":"");
+  const isActive = !!policy;
+  document.getElementById("pc-status-label").textContent = isActive ? "Active Policy" : "Not Activated";
+  document.getElementById("pc-status-val").textContent = isActive ? "Active ✓" : "Inactive";
+  document.getElementById("pc-status-val").style.color = isActive ? "rgba(255,255,255,0.9)" : "rgba(255,220,100,0.9)";
+  const sinceDate = policy?.startDate ? new Date(policy.startDate).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}) : "—";
+  document.getElementById("pc-since").textContent = sinceDate;
+  const bd = calcPremiumBreakdown(worker.city, worker.weeklyEarnings||6000);
+  document.getElementById("pb-base").textContent = "₹"+bd.base;
+  document.getElementById("pb-city").textContent = "₹"+bd.cityLoad;
+  document.getElementById("pb-earn").textContent = "₹"+bd.earnAdj;
+  document.getElementById("pb-tier").textContent = bd.tier+" risk";
+  document.getElementById("pb-total").textContent = "₹"+bd.total+" / week";
+  document.getElementById("go-dash-btn").onclick = () => location.href="dashboard.html?phone="+phone;
+}
 </script>
 </body>
 </html>
