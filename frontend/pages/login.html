@@ -556,13 +556,13 @@
 
     .otp-boxes {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       justify-content: center;
       margin-bottom: 24px;
     }
     .otp-box {
-      width: 64px;
-      height: 72px;
+      width: 52px;
+      height: 62px;
       text-align: center;
       font-size: 1.8rem;
       font-weight: 700;
@@ -592,34 +592,6 @@
       20%,60% { transform: translateX(-6px); }
       40%,80% { transform: translateX(6px); }
     }
-
-    /* Demo banner */
-    .demo-banner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      border-radius: 10px;
-      padding: 10px 14px;
-      margin-bottom: 20px;
-      gap: 10px;
-    }
-    .demo-banner__text { font-size: 0.78rem; color: #059669; font-weight: 500; }
-    .demo-banner__fill {
-      background: var(--white);
-      border: 1px solid #86efac;
-      color: #059669;
-      font-size: 0.78rem;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 7px;
-      cursor: pointer;
-      font-family: monospace;
-      letter-spacing: 0.1em;
-      transition: background 0.15s;
-    }
-    .demo-banner__fill:hover { background: #dcfce7; }
 
     /* Resend row */
     .resend-row {
@@ -951,20 +923,17 @@
       <!-- Panel 2: OTP -->
       <div id="panel-otp" style="display:none;">
         <p class="otp-label">
-          Enter the 4-digit code sent to<br>
+          Enter the 6-digit code sent to<br>
           <strong id="otp-phone-label"></strong>
         </p>
-
-        <div class="demo-banner" id="demo-banner" style="display:none;">
-          <span class="demo-banner__text">🧪 Demo mode — tap to fill:</span>
-          <button class="demo-banner__fill" onclick="autofillOtp()">1 2 3 4</button>
-        </div>
 
         <div class="otp-boxes">
           <input class="otp-box" id="b0" type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code" />
           <input class="otp-box" id="b1" type="text" maxlength="1" inputmode="numeric" />
           <input class="otp-box" id="b2" type="text" maxlength="1" inputmode="numeric" />
           <input class="otp-box" id="b3" type="text" maxlength="1" inputmode="numeric" />
+          <input class="otp-box" id="b4" type="text" maxlength="1" inputmode="numeric" />
+          <input class="otp-box" id="b5" type="text" maxlength="1" inputmode="numeric" />
         </div>
 
         <div class="verify-loader" id="verify-loader">
@@ -1007,307 +976,220 @@
 </div>
 
 <script>
-// ─── Minimal auth stub (replaces realtime.js dependency) ────────────────────
-const ZS_AUTH = {
-  save(d) { try { localStorage.setItem('zs_auth', JSON.stringify(d)); } catch{} },
-  clear()  { try { localStorage.removeItem('zs_auth'); } catch{} },
-  isLoggedIn() {
-    try { const d = JSON.parse(localStorage.getItem('zs_auth') || 'null'); return !!(d && d.token); } catch{ return false; }
-  },
-  getPhone() {
-    try { return (JSON.parse(localStorage.getItem('zs_auth') || 'null') || {}).phone || ''; } catch{ return ''; }
-  }
+/* ═══════════════════════════════════════════════
+   OFFLINE DEMO — no backend needed
+   ═══════════════════════════════════════════════ */
+
+const TEST_OTPS = {
+  "9692966390": "748392",
+  "6294778192": "627291",
+  "8117847759": "320814",
 };
 
-function attachConnectionIndicator(id) {
-  const dot = document.getElementById(id);
-  if (!dot) return;
-  // Try WebSocket
-  try {
-    const ws = new WebSocket('ws://localhost:5000');
-    ws.onopen  = () => dot.classList.add('connected');
-    ws.onerror = () => {};
-    ws.onclose = () => dot.classList.remove('connected');
-  } catch {}
+const DEMO_WORKERS = {
+  "9692966390": { name:"Ravi Kumar",   city:"Bhubaneswar", weeklyEarnings:7500, joinDate:"2025-11-14" },
+  "6294778192": { name:"Priya Sharma", city:"Mumbai",      weeklyEarnings:9200, joinDate:"2026-01-03" },
+  "8117847759": { name:"Amit Patel",   city:"Delhi",       weeklyEarnings:6000, joinDate:"2025-12-20" },
+};
+
+const GENERATED_CITIES = ["Bhubaneswar","Mumbai","Delhi","Bengaluru","Hyderabad","Chennai","Kolkata","Pune","Surat","Jaipur"];
+const GENERATED_NAMES  = ["Ravi Kumar","Arjun Singh","Meena Das","Sunil Rao","Pooja Nair","Rohit Verma","Kavya Pillai","Dinesh Babu","Sunita Devi","Manoj Gupta"];
+
+function workerForPhone(phone) {
+  if (DEMO_WORKERS[phone]) return DEMO_WORKERS[phone];
+  const idx = parseInt(phone.slice(-2)) % GENERATED_CITIES.length;
+  return {
+    name: GENERATED_NAMES[idx],
+    city: GENERATED_CITIES[idx],
+    weeklyEarnings: 5000 + (parseInt(phone.slice(-3)) % 8) * 500,
+    joinDate: "2026-01-15",
+  };
 }
 
-async function apiFetch(method, path, body) {
-  try {
-    const res = await fetch(`http://localhost:5000${path}`, {
-      method,
-      headers: { 'Content-Type': 'application/json',
-        ...(ZS_AUTH.isLoggedIn() ? { Authorization: `Bearer ${JSON.parse(localStorage.getItem('zs_auth')).token}` } : {})
-      },
-      ...(body ? { body: JSON.stringify(body) } : {})
-    });
-    const data = await res.json();
-    return { ok: res.ok, data };
-  } catch { return null; }
+const CITY_RISK = {
+  Mumbai:{rain:2400,temp:38,aqi:145,flood:3.2}, Chennai:{rain:1400,temp:42,aqi:120,flood:2.1},
+  Kolkata:{rain:1800,temp:40,aqi:180,flood:2.8}, Hyderabad:{rain:900,temp:42,aqi:130,flood:1.5},
+  Bengaluru:{rain:970,temp:35,aqi:95,flood:0.8}, Delhi:{rain:750,temp:45,aqi:280,flood:0.5},
+  Pune:{rain:720,temp:38,aqi:85,flood:0.6}, Ahmedabad:{rain:800,temp:46,aqi:150,flood:0.4},
+  Jaipur:{rain:550,temp:46,aqi:170,flood:0.2}, Surat:{rain:1200,temp:38,aqi:130,flood:1.0},
+  Lucknow:{rain:900,temp:44,aqi:200,flood:0.6}, Bhubaneswar:{rain:1500,temp:40,aqi:100,flood:1.8},
+  Nagpur:{rain:1100,temp:47,aqi:110,flood:0.7}, Indore:{rain:950,temp:43,aqi:120,flood:0.5},
+  Visakhapatnam:{rain:1100,temp:40,aqi:90,flood:1.2}, Coimbatore:{rain:700,temp:36,aqi:80,flood:0.4},
+};
+
+function calcPremium(city, weeklyEarnings) {
+  const cf = CITY_RISK[city] || {rain:900,temp:40,aqi:120,flood:0.8};
+  const rainS  = Math.min(cf.rain/2400,1), tempS = Math.max((cf.temp-30)/20,0);
+  const aqiS   = Math.min(cf.aqi/350,1),  floodS = Math.min(cf.flood/4,1);
+  const overall = rainS*0.30+tempS*0.20+aqiS*0.15+floodS*0.35;
+  const cityLoad = Math.round(overall*30), earnAdj = Math.round((weeklyEarnings/12000)*10);
+  const total = 20+cityLoad+earnAdj;
+  return { base:20, cityLoad, earnAdj, total,
+    tier: overall>=0.6?"High":overall>=0.35?"Medium":"Low",
+    tierEmoji: overall>=0.6?"🔴":overall>=0.35?"🟡":"🟢",
+    rainPct:Math.round(rainS*100), tempPct:Math.round(tempS*100),
+    aqiPct:Math.round(aqiS*100), floodPct:Math.round(floodS*100) };
 }
-// ────────────────────────────────────────────────────────────────────────────
 
-const API = "http://localhost:5000";
+function genPolicyId(phone) {
+  const seed = parseInt(phone.slice(-6));
+  return "ZS-2026-"+((seed*31337)%0xFFFFFF).toString(16).toUpperCase().padStart(6,"0");
+}
 
+/* ── State ── */
 let currentPhone = "";
-let currentMode  = "worker";
+let currentOTP   = "";
 let resendTimer  = null;
-let isDemoMode   = false;
 
-attachConnectionIndicator("ws-dot");
-
-// Session guard
-(async function checkSession() {
-  if (!ZS_AUTH.isLoggedIn()) return;
-  const { ok, data } = await apiFetch("GET", "/api/auth/me") || {};
-  if (ok) {
-    ZS_AUTH.save({ isAdmin: data.isAdmin, worker: data.worker });
-    goToDest(data.isAdmin, data.workerExists || !!data.worker, ZS_AUTH.getPhone());
-  } else {
-    ZS_AUTH.clear();
-  }
-})();
-
-// Mode switching
+/* ── Mode toggle (keep UI working but no real admin) ── */
 function setMode(mode) {
-  currentMode = mode;
-  document.getElementById("btn-worker").classList.toggle("mode-btn--active", mode === "worker");
-  document.getElementById("btn-admin").classList.toggle("mode-btn--active",  mode === "admin");
-  document.getElementById("admin-notice").classList.toggle("visible", mode === "admin");
-  document.getElementById("below-form").style.display = "";
+  document.getElementById("btn-worker").classList.toggle("mode-btn--active", mode==="worker");
+  document.getElementById("btn-admin").classList.toggle("mode-btn--active",  mode==="admin");
+  document.getElementById("admin-notice").classList.toggle("visible", mode==="admin");
 }
 
-// Step indicators
-function setDot(n, state) {
-  const dot = document.getElementById(`dot-${n}`);
-  const lbl = document.getElementById(`lbl-${n}`);
-  dot.className = `step-circle step-circle--${state}`;
-  dot.textContent = state === "done" ? "✓" : String(n);
-  if (lbl) lbl.className = `step-label${state === "active" ? " step-label--active" : ""}`;
+/* ── Step dots ── */
+function setDot(n,state) {
+  const dot=document.getElementById(`dot-${n}`), lbl=document.getElementById(`lbl-${n}`);
+  dot.className=`step-circle step-circle--${state}`;
+  dot.textContent=state==="done"?"✓":String(n);
+  if(lbl) lbl.className=`step-label${state==="active"?" step-label--active":""}`;
 }
-function setLine(n, done) {
-  document.getElementById(`line-${n}`).className = `step-connector${done ? " step-connector--done" : ""}`;
+function setLine(n,done) {
+  document.getElementById(`line-${n}`).className=`step-connector${done?" step-connector--done":""}`;
 }
 
 function showPanel(name) {
   ["phone","otp","done"].forEach(p =>
-    document.getElementById(`panel-${p}`).style.display = p === name ? "block" : "none"
+    document.getElementById(`panel-${p}`).style.display = p===name ? "block" : "none"
   );
-  // Add transition class
   const panel = document.getElementById(`panel-${name}`);
-  panel.classList.remove("panel-transition");
-  void panel.offsetWidth;
-  panel.classList.add("panel-transition");
-
-  document.getElementById("mode-toggle").style.display = name === "phone" ? "flex" : "none";
-  document.getElementById("below-form").style.display = name === "done" ? "none" : "";
-
-  if (name === "phone")  { setDot(1,"active"); setDot(2,"pending"); setDot(3,"pending"); setLine(1,false); setLine(2,false); }
-  if (name === "otp")    { setDot(1,"done"); setDot(2,"active"); setDot(3,"pending"); setLine(1,true); setLine(2,false); setTimeout(() => boxes[0].focus(), 60); }
-  if (name === "done")   { setDot(1,"done"); setDot(2,"done"); setDot(3,"done"); setLine(1,true); setLine(2,true); }
+  panel.classList.remove("panel-transition"); void panel.offsetWidth; panel.classList.add("panel-transition");
+  document.getElementById("mode-toggle").style.display = name==="phone" ? "flex" : "none";
+  document.getElementById("below-form").style.display  = name==="done"  ? "none" : "";
+  if(name==="phone") { setDot(1,"active"); setDot(2,"pending"); setDot(3,"pending"); setLine(1,false); setLine(2,false); }
+  if(name==="otp")   { setDot(1,"done");  setDot(2,"active");  setDot(3,"pending"); setLine(1,true);  setLine(2,false); setTimeout(()=>boxes[0].focus(),60); }
+  if(name==="done")  { setDot(1,"done");  setDot(2,"done");    setDot(3,"done");    setLine(1,true);  setLine(2,true); }
 }
 
-// Error helpers
-function showErr(panel, msg) {
-  const el = document.getElementById(`${panel}-err`);
-  el.textContent = msg; el.classList.add("visible");
+function showErr(panel,msg) {
+  const el=document.getElementById(`${panel}-err`); el.textContent=msg; el.classList.add("visible");
 }
-function clearErr(panel) {
-  document.getElementById(`${panel}-err`).classList.remove("visible");
-}
+function clearErr(panel) { document.getElementById(`${panel}-err`).classList.remove("visible"); }
 
-// Send OTP
+/* ── Send OTP (offline) ── */
 document.getElementById("btn-send").addEventListener("click", sendOtp);
-document.getElementById("inp-phone").addEventListener("keydown", e => { if (e.key === "Enter") sendOtp(); });
+document.getElementById("inp-phone").addEventListener("keydown", e => { if(e.key==="Enter") sendOtp(); });
 
-async function sendOtp() {
+function sendOtp() {
   const phone = document.getElementById("inp-phone").value.trim();
   clearErr("phone");
+  if(!/^\d{10}$/.test(phone)) { showErr("phone","Please enter a valid 10-digit mobile number."); return; }
 
-  if (!/^\d{10}$/.test(phone)) {
-    showErr("phone", "Please enter a valid 10-digit mobile number.");
-    return;
-  }
+  currentPhone = phone;
+  currentOTP   = TEST_OTPS[phone] || String(Math.floor(100000+Math.random()*900000));
 
-  const btn = document.getElementById("btn-send");
-  btn.querySelector("span").textContent = "Sending…";
-  btn.disabled = true;
-
-  try {
-    const res = await fetch(`${API}/api/auth/send-otp`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone }),
-    });
-    const data = await res.json();
-
-    if (!res.ok) {
-      showErr("phone", data.error || "Failed to send OTP");
-      return;
-    }
-
-    currentPhone = phone;
-    isDemoMode   = !!data.demo;
-    document.getElementById("otp-phone-label").textContent = `+91 ${phone}`;
-    document.getElementById("demo-banner").style.display = data.demo ? "flex" : "none";
-
-    showPanel("otp");
-    startResend();
-
-  } catch {
-    showErr("phone", "Network error — is the server running?");
-  } finally {
-    btn.querySelector("span").textContent = "Send OTP →";
-    btn.disabled = false;
-  }
+  document.getElementById("otp-phone-label").textContent = `+91 ${phone.replace(/(\d{5})(\d{5})/,"$1 $2")}`;
+  showPanel("otp");
+  startResend();
 }
 
-// OTP boxes
-const boxes = [0,1,2,3].map(i => document.getElementById(`b${i}`));
+/* ── OTP boxes (6 digits) ── */
+const boxes = [0,1,2,3,4,5].map(i => document.getElementById(`b${i}`));
 
-boxes.forEach((box, i) => {
+boxes.forEach((box,i) => {
   box.addEventListener("input", e => {
     const v = e.target.value.replace(/\D/g,"");
     e.target.value = v;
     box.classList.toggle("filled", !!v);
-    if (v && i < 3) boxes[i+1].focus();
-    if (v && i === 3) tryAutoVerify();
+    if(v && i<5) boxes[i+1].focus();
+    if(v && i===5) tryAutoVerify();
   });
-
   box.addEventListener("keydown", e => {
-    if (e.key === "Backspace" && !box.value && i > 0) {
-      boxes[i-1].value = ""; boxes[i-1].classList.remove("filled"); boxes[i-1].focus();
+    if(e.key==="Backspace" && !box.value && i>0) {
+      boxes[i-1].value=""; boxes[i-1].classList.remove("filled"); boxes[i-1].focus();
     }
   });
-
   box.addEventListener("paste", e => {
     e.preventDefault();
-    const digits = (e.clipboardData || window.clipboardData).getData("text").replace(/\D/g,"").slice(0,4);
-    digits.split("").forEach((d,j) => { if (boxes[j]) { boxes[j].value = d; boxes[j].classList.add("filled"); } });
-    if (digits.length >= 4) tryAutoVerify();
-    else boxes[Math.min(digits.length, 3)].focus();
+    const digits = (e.clipboardData||window.clipboardData).getData("text").replace(/\D/g,"").slice(0,6);
+    digits.split("").forEach((d,j) => { if(boxes[j]) { boxes[j].value=d; boxes[j].classList.add("filled"); } });
+    if(digits.length>=6) tryAutoVerify();
+    else boxes[Math.min(digits.length,5)].focus();
   });
 });
 
-function getOtp() { return boxes.map(b => b.value).join(""); }
-function tryAutoVerify() { if (getOtp().length === 4) setTimeout(() => document.getElementById("btn-verify").click(), 250); }
+function getOtp() { return boxes.map(b=>b.value).join(""); }
+function tryAutoVerify() { if(getOtp().length===6) setTimeout(()=>document.getElementById("btn-verify").click(),250); }
 
-function autofillOtp() {
-  "1234".split("").forEach((d,i) => { boxes[i].value = d; boxes[i].classList.add("filled"); });
-  setTimeout(() => document.getElementById("btn-verify").click(), 300);
-}
-
-// Verify OTP
+/* ── Verify OTP ── */
 document.getElementById("btn-verify").addEventListener("click", verifyOtp);
 
-async function verifyOtp() {
+function verifyOtp() {
   const otp = getOtp();
   clearErr("otp");
+  if(otp.length!==6) { showErr("otp","Please enter the 6-digit code."); return; }
 
-  if (otp.length !== 4) { showErr("otp", "Please enter the 4-digit code."); return; }
-
-  const btn    = document.getElementById("btn-verify");
-  const loader = document.getElementById("verify-loader");
-  btn.style.display = "none";
-  loader.classList.add("visible");
-
-  try {
-    const res = await fetch(`${API}/api/auth/verify-otp`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone: currentPhone, otp }),
-    });
-    const data = await res.json();
-
-    if (!res.ok) {
-      showErr("otp", data.error || "Invalid OTP");
-      shakeBoxes();
-      boxes.forEach(b => { b.value = ""; b.classList.remove("filled"); });
-      boxes[0].focus();
-      return;
-    }
-
-    ZS_AUTH.save({ token: data.token, phone: currentPhone, isAdmin: data.isAdmin || currentMode === "admin", worker: data.worker });
-    clearTimeout(resendTimer);
-    showPanel("done");
-    goToDest(data.isAdmin || currentMode === "admin", data.workerExists, currentPhone);
-
-  } catch {
-    showErr("otp", "Network error — please try again.");
-  } finally {
-    loader.classList.remove("visible");
-    btn.style.display = "block";
-    btn.disabled = false;
+  if(otp !== currentOTP) {
+    showErr("otp","Incorrect OTP. Please check and try again.");
+    shakeBoxes();
+    boxes.forEach(b=>{b.value="";b.classList.remove("filled");}); boxes[0].focus();
+    return;
   }
-}
 
-function goToDest(isAdmin, workerExists, phone) {
+  clearInterval(resendTimer);
+
+  /* Build and store policy data, then redirect */
+  const worker  = workerForPhone(currentPhone);
+  const premium = calcPremium(worker.city, worker.weeklyEarnings);
+  sessionStorage.setItem("zs_policy", JSON.stringify({
+    phone    : currentPhone,
+    policyId : genPolicyId(currentPhone),
+    name     : worker.name,
+    city     : worker.city,
+    joinDate : worker.joinDate,
+    weeklyEarnings: worker.weeklyEarnings,
+    premium, isActive:true, claims:0,
+  }));
+
+  showPanel("done");
   const sub  = document.getElementById("done-sub");
   const btnP = document.getElementById("btn-continue");
   const btnS = document.getElementById("btn-secondary");
-  const next = new URLSearchParams(location.search).get("next");
-
-  if (isAdmin) {
-    sub.textContent = "Redirecting to admin dashboard…";
-    btnP.querySelector("span").textContent = "Open admin dashboard →";
-    btnP.onclick = () => location.href = "admin.html";
-    btnS.style.display = "none";
-    setTimeout(() => location.href = next || "admin.html", 1500);
-  } else if (workerExists) {
-    sub.textContent = "Redirecting to your dashboard…";
-    btnP.querySelector("span").textContent = "Go to dashboard →";
-    btnP.onclick = () => location.href = next || `dashboard.html?phone=${phone}`;
-    btnS.style.display = "none";
-    setTimeout(() => location.href = next || `dashboard.html?phone=${phone}`, 1500);
-  } else {
-    sub.textContent = "Phone verified! Let's complete your profile.";
-    btnP.style.display = "none";
-    btnS.style.display = "block";
-    btnS.textContent   = "Create your account →";
-    btnS.onclick = () => location.href = `register.html?phone=${phone}`;
-    setTimeout(() => location.href = `register.html?phone=${phone}`, 1500);
-  }
+  sub.textContent = "Redirecting to your policy…";
+  btnP.querySelector("span").textContent = "View my policy →";
+  btnP.onclick = () => location.href = "policy.html";
+  btnS.style.display = "none";
+  setTimeout(() => location.href = "policy.html", 1500);
 }
 
-// Resend timer
+/* ── Resend ── */
 function startResend() {
-  let t = 30;
-  const btn = document.getElementById("btn-resend");
-  const cnt = document.getElementById("resend-count");
-  btn.disabled = true;
-  cnt.textContent = t;
-
+  let t=30;
+  const btn=document.getElementById("btn-resend"), cnt=document.getElementById("resend-count");
+  btn.disabled=true; cnt.textContent=t;
   clearInterval(resendTimer);
-  resendTimer = setInterval(() => {
-    t--; cnt.textContent = t;
-    if (t <= 0) { clearInterval(resendTimer); btn.disabled = false; btn.innerHTML = "Resend OTP"; }
-  }, 1000);
+  resendTimer=setInterval(()=>{
+    t--; cnt.textContent=t;
+    if(t<=0){ clearInterval(resendTimer); btn.disabled=false; btn.innerHTML="Resend OTP"; }
+  },1000);
 }
 
-document.getElementById("btn-resend").addEventListener("click", async () => {
-  if (!currentPhone) return;
-  try {
-    await fetch(`${API}/api/auth/send-otp`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone: currentPhone }),
-    });
-  } catch {}
+document.getElementById("btn-resend").addEventListener("click", ()=>{
+  if(!currentPhone) return;
+  currentOTP = TEST_OTPS[currentPhone] || String(Math.floor(100000+Math.random()*900000));
   startResend();
-  boxes.forEach(b => { b.value = ""; b.classList.remove("filled"); });
-  boxes[0].focus();
+  boxes.forEach(b=>{b.value="";b.classList.remove("filled");}); boxes[0].focus();
 });
 
 function shakeBoxes() {
-  boxes.forEach(b => {
-    b.classList.remove("error-shake");
-    void b.offsetWidth;
-    b.classList.add("error-shake");
-  });
+  boxes.forEach(b=>{ b.classList.remove("error-shake"); void b.offsetWidth; b.classList.add("error-shake"); });
 }
 
-// Pre-fill from URL
+/* ── Pre-fill from URL ── */
 const urlP = new URLSearchParams(location.search);
-if (urlP.get("phone")) document.getElementById("inp-phone").value = urlP.get("phone");
-if (urlP.get("mode") === "admin") setMode("admin");
+if(urlP.get("phone")) document.getElementById("inp-phone").value = urlP.get("phone");
+if(urlP.get("mode")==="admin") setMode("admin");
 </script>
 </body>
 </html>

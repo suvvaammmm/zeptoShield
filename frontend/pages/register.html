@@ -49,6 +49,29 @@
     .reg-success__title { font-family: var(--serif); font-size: 1.7rem; color: var(--ink); margin-bottom: 8px; }
     .reg-success__sub { font-size: 0.875rem; color: var(--ink-soft); margin-bottom: 24px; line-height: 1.6; }
 
+    /* OTP step */
+    .otp-step { display:none; }
+    .otp-step.active { display:block; animation: fadein 0.35s ease; }
+    @keyframes fadein { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+    .otp-hint { font-size:0.8rem; color:var(--ink-faint); margin-bottom:20px; line-height:1.5; }
+    .otp-hint strong { color:var(--ink-soft); }
+    .otp-row { display:flex; gap:10px; justify-content:center; margin-bottom:20px; }
+    .otp-digit {
+      width:54px; height:60px; text-align:center; font-size:1.6rem; font-weight:700;
+      font-family:var(--serif); color:var(--ink);
+      border:2px solid var(--border); border-radius:var(--radius-sm);
+      background:var(--surface); outline:none; transition:border-color 0.15s;
+    }
+    .otp-digit:focus { border-color:var(--p500); background:#fff; box-shadow:0 0 0 3px rgba(139,92,246,0.12); }
+    .otp-digit.filled { border-color:var(--p400); background:var(--p50); }
+    .otp-resend { font-size:0.8rem; color:var(--ink-faint); text-align:center; margin-bottom:16px; }
+    .otp-resend a { color:var(--p600); cursor:pointer; font-weight:500; }
+    .otp-timer { font-variant-numeric:tabular-nums; }
+    .otp-error { background:#fef2f2; border:1px solid #fecaca; border-radius:var(--radius-sm); padding:10px 14px; font-size:0.82rem; color:var(--error); margin-bottom:12px; display:none; }
+    .otp-error.visible { display:block; }
+    .back-link { display:inline-flex; align-items:center; gap:6px; font-size:0.82rem; color:var(--p600); cursor:pointer; margin-bottom:20px; background:none; border:none; font-family:var(--sans); padding:0; }
+    .back-link:hover { text-decoration:underline; }
+
     /* Live feed */
     .live-feed { position: fixed; bottom: 24px; left: 24px; max-width: 280px; z-index: 100; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
     .feed-item {
@@ -178,11 +201,35 @@
         <div class="field-error" id="reg-err"></div>
 
         <button class="btn btn--primary btn--full" id="btn-register" style="margin-top:24px;">
-          Create account →
+          Continue to verify →
         </button>
         <p style="font-size:0.73rem;color:var(--ink-faint);text-align:center;margin-top:12px;line-height:1.5;">
           By registering you accept our terms. Your phone number is verified via OTP.
         </p>
+      </div>
+
+      <!-- OTP Verification Step -->
+      <div class="otp-step" id="reg-otp-step">
+        <button class="back-link" id="reg-otp-back">← Back to form</button>
+        <div class="eyebrow-pill">Verify number</div>
+        <h2 style="font-family:var(--serif);font-size:1.5rem;margin-bottom:8px;">Enter OTP.</h2>
+        <p class="otp-hint">A 6-digit code was sent to <strong id="reg-otp-phone-display">+91 XXXXXXXXXX</strong>.</p>
+
+        <div class="otp-row" id="reg-otp-row">
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" />
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        </div>
+        <div class="otp-error" id="reg-otp-err">Incorrect OTP. Please check and try again.</div>
+        <div class="otp-resend">
+          Didn't receive it?
+          <span id="reg-resend-timer-wrap"> Resend in <span class="otp-timer" id="reg-resend-timer">30</span>s</span>
+          <span id="reg-resend-link-wrap" style="display:none;"><a onclick="regResendOTP()">Resend OTP</a></span>
+        </div>
+        <button class="btn btn--primary btn--full" id="reg-verify-btn">Verify &amp; Create Account →</button>
       </div>
 
       <!-- Success -->
@@ -262,7 +309,19 @@ const sessionPhone=ZS_AUTH.getPhone();
 if (sessionPhone && !urlPhone) document.getElementById("inp-phone").value=sessionPhone;
 updatePremiumPreview();
 
-document.getElementById("btn-register").addEventListener("click", async () => {
+/* ── TEST NUMBERS with fixed OTPs ── */
+const TEST_OTPS = {
+  "9692966390": "748392",
+  "6294778192": "627291",
+  "8117847759": "320814",
+};
+
+let regPendingData = null;
+let regGeneratedOTP = "";
+let regResendInterval = null;
+
+/* ── STEP 1: Validate form → show OTP step ── */
+document.getElementById("btn-register").addEventListener("click", () => {
   const name=document.getElementById("inp-name").value.trim();
   const phone=document.getElementById("inp-phone").value.trim();
   const city=document.getElementById("inp-city").value;
@@ -273,26 +332,110 @@ document.getElementById("btn-register").addEventListener("click", async () => {
   if (!name) return showErr("Name is required.");
   if (!/^\d{10}$/.test(phone)) return showErr("Valid 10-digit phone required.");
   if (!city) return showErr("Please select your city.");
-  if (!ZS_AUTH.isLoggedIn()||ZS_AUTH.getPhone()!==phone) {
-    location.href=`login.html?phone=${phone}&next=${encodeURIComponent(location.pathname+location.search)}`;
-    return;
+  // Store for later submission
+  regPendingData = {name, phone, city, weeklyEarnings:parseFloat(earnings)||6000, upiId:upiId||null};
+  // Determine OTP (fixed for test numbers, random for others)
+  regGeneratedOTP = TEST_OTPS[phone] || String(Math.floor(100000 + Math.random() * 900000));
+  document.getElementById("reg-otp-phone-display").textContent = "+91 " + phone.replace(/(\d{5})(\d{5})/, "$1 $2");
+  regClearOTPInputs();
+  regStartResendTimer();
+  // Switch views
+  document.getElementById("reg-form").style.display = "none";
+  document.getElementById("reg-otp-step").classList.add("active");
+  window.scrollTo({top:0, behavior:"smooth"});
+  document.querySelectorAll("#reg-otp-row .otp-digit")[0].focus();
+});
+
+/* ── OTP back button ── */
+document.getElementById("reg-otp-back").addEventListener("click", () => {
+  clearInterval(regResendInterval);
+  document.getElementById("reg-otp-step").classList.remove("active");
+  document.getElementById("reg-form").style.display = "block";
+  document.getElementById("reg-otp-err").classList.remove("visible");
+});
+
+/* ── OTP digit inputs ── */
+const regDigits = () => Array.from(document.querySelectorAll("#reg-otp-row .otp-digit"));
+function regClearOTPInputs() {
+  regDigits().forEach(d => { d.value=""; d.classList.remove("filled"); });
+  document.getElementById("reg-otp-err").classList.remove("visible");
+}
+document.getElementById("reg-otp-row").addEventListener("input", e => {
+  const el = e.target;
+  if (!el.classList.contains("otp-digit")) return;
+  const val = el.value.replace(/\D/g,"").slice(-1);
+  el.value = val;
+  el.classList.toggle("filled", !!val);
+  if (val) {
+    const next = el.nextElementSibling;
+    if (next && next.classList.contains("otp-digit")) next.focus();
+    else setTimeout(regTryAutoVerify, 120);
   }
-  const btn=document.getElementById("btn-register");
-  btn.textContent="Creating account…"; btn.disabled=true;
-  const result=await apiFetch("POST","/api/workers/register",{name,city,weeklyEarnings:parseFloat(earnings)||6000,upiId:upiId||null});
-  if (!result||!result.ok) {
-    const msg=result?.data?.error||"Registration failed.";
+});
+document.getElementById("reg-otp-row").addEventListener("keydown", e => {
+  if (e.key === "Backspace" && !e.target.value) {
+    const prev = e.target.previousElementSibling;
+    if (prev && prev.classList.contains("otp-digit")) { prev.value=""; prev.classList.remove("filled"); prev.focus(); }
+  }
+});
+function regTryAutoVerify() {
+  if (regDigits().every(d => d.value)) regVerifyOTP();
+}
+document.getElementById("reg-verify-btn").addEventListener("click", regVerifyOTP);
+
+async function regVerifyOTP() {
+  const code = regDigits().map(d => d.value).join("");
+  const errEl = document.getElementById("reg-otp-err");
+  errEl.classList.remove("visible");
+  if (code.length < 6) { errEl.textContent="Please enter all 6 digits."; errEl.classList.add("visible"); return; }
+  if (code !== regGeneratedOTP) {
+    errEl.textContent="Incorrect OTP. Please check and try again."; errEl.classList.add("visible");
+    regDigits().forEach(d=>{d.value="";d.classList.remove("filled");}); regDigits()[0].focus(); return;
+  }
+  clearInterval(regResendInterval);
+  // OTP verified — now create the account
+  const btn = document.getElementById("reg-verify-btn");
+  btn.textContent = "Creating account…"; btn.disabled = true;
+  const {name, phone, city, weeklyEarnings, upiId} = regPendingData;
+  const result = await apiFetch("POST", "/api/workers/register", {name, city, weeklyEarnings, upiId});
+  if (!result || !result.ok) {
+    const msg = result?.data?.error || "Registration failed.";
     if (msg.includes("Already registered")) { location.href=`dashboard.html?phone=${phone}`; return; }
-    showErr(msg); btn.textContent="Create account →"; btn.disabled=false; return;
+    errEl.textContent = msg; errEl.classList.add("visible");
+    btn.textContent = "Verify & Create Account →"; btn.disabled = false; return;
   }
-  const worker=result.data.worker;
+  const worker = result.data.worker;
   ZS_AUTH.save({worker});
-  document.getElementById("reg-form").style.display="none";
+  document.getElementById("reg-otp-step").classList.remove("active");
   document.getElementById("reg-success").classList.add("visible");
   document.getElementById("success-msg").textContent=`Welcome, ${worker.name}! Your ML-calculated premium is ₹${worker.premium}/week with ₹1,500 coverage.`;
   document.getElementById("btn-to-dashboard").onclick=()=>location.href=`dashboard.html?phone=${phone}`;
   setTimeout(()=>location.href=`dashboard.html?phone=${phone}`,2500);
-});
+}
+
+function regStartResendTimer() {
+  let secs = 30;
+  document.getElementById("reg-resend-timer").textContent = secs;
+  document.getElementById("reg-resend-timer-wrap").style.display = "inline";
+  document.getElementById("reg-resend-link-wrap").style.display = "none";
+  clearInterval(regResendInterval);
+  regResendInterval = setInterval(() => {
+    secs--;
+    document.getElementById("reg-resend-timer").textContent = secs;
+    if (secs <= 0) {
+      clearInterval(regResendInterval);
+      document.getElementById("reg-resend-timer-wrap").style.display = "none";
+      document.getElementById("reg-resend-link-wrap").style.display = "inline";
+    }
+  }, 1000);
+}
+function regResendOTP() {
+  const phone = regPendingData?.phone || "";
+  regGeneratedOTP = TEST_OTPS[phone] || String(Math.floor(100000 + Math.random() * 900000));
+  regClearOTPInputs();
+  regStartResendTimer();
+  regDigits()[0].focus();
+}
 
 function showErr(msg) {
   const el=document.getElementById("reg-err");

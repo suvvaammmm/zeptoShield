@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Policy Details — ZeptoShield</title>
+  <link rel="stylesheet" href="../css/theme.css" />
+  <style>
+    @keyframes fadein { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+    @keyframes pop    { from{transform:scale(0.92);opacity:0} to{transform:scale(1);opacity:1} }
+
+    .policy-wrap { max-width:520px; margin:0 auto; padding:96px 20px 80px; animation:fadein 0.4s ease; }
+
+    /* ── Hero card ── */
+    .hero-card {
+      background:linear-gradient(135deg,var(--p950),var(--p800));
+      border-radius:20px; padding:30px 26px 26px;
+      color:#fff; position:relative; overflow:hidden;
+      margin-bottom:28px; animation:pop 0.45s ease;
+      box-shadow:0 16px 48px rgba(45,18,84,0.35);
+    }
+    .hero-card::before {
+      content:''; position:absolute; top:-60px; right:-60px;
+      width:220px; height:220px; border-radius:50%;
+      background:rgba(255,255,255,0.04); pointer-events:none;
+    }
+    .hero-card::after {
+      content:''; position:absolute; bottom:-40px; left:-30px;
+      width:140px; height:140px; border-radius:50%;
+      background:rgba(255,255,255,0.03); pointer-events:none;
+    }
+    .status-badge {
+      display:inline-flex; align-items:center; gap:7px;
+      background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2);
+      border-radius:99px; font-size:0.68rem; font-weight:700;
+      letter-spacing:0.07em; text-transform:uppercase;
+      padding:5px 13px; color:#d4b8ff; margin-bottom:22px;
+    }
+    .status-dot { width:7px; height:7px; border-radius:50%; background:#6ee7b7; flex-shrink:0; }
+    .policy-id-label { font-size:0.65rem; text-transform:uppercase; letter-spacing:0.09em; color:rgba(255,255,255,0.45); margin-bottom:4px; }
+    .policy-id-val { font-family:var(--serif); font-size:1rem; letter-spacing:0.05em; color:rgba(255,255,255,0.9); margin-bottom:22px; }
+    .holder-name { font-family:var(--serif); font-size:1.9rem; letter-spacing:-0.02em; color:#fff; margin-bottom:4px; line-height:1.15; }
+    .holder-city { font-size:0.83rem; color:rgba(255,255,255,0.55); margin-bottom:24px; }
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .stat-item {}
+    .stat-label { font-size:0.63rem; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.4); margin-bottom:3px; }
+    .stat-val   { font-size:1.05rem; font-weight:600; color:#fff; }
+
+    /* ── Section heading ── */
+    .sec-head {
+      font-size:0.7rem; font-weight:700; text-transform:uppercase;
+      letter-spacing:0.08em; color:var(--p600);
+      margin:28px 0 14px; display:flex; align-items:center; gap:8px;
+    }
+    .sec-head::after { content:''; flex:1; height:1px; background:var(--p200); }
+
+    /* ── Coverage items ── */
+    .cov-list { display:flex; flex-direction:column; gap:10px; margin-bottom:4px; }
+    .cov-item {
+      display:flex; align-items:flex-start; gap:14px;
+      background:#fff; border:1.5px solid var(--p100);
+      border-radius:var(--radius-sm); padding:16px 18px;
+      transition:border-color 0.15s, box-shadow 0.15s;
+    }
+    .cov-item:hover { border-color:var(--p300); box-shadow:0 4px 16px rgba(109,40,217,0.08); }
+    .cov-icon { font-size:1.4rem; flex-shrink:0; margin-top:1px; }
+    .cov-body {}
+    .cov-title { font-size:0.875rem; font-weight:600; color:var(--ink); margin-bottom:3px; }
+    .cov-desc  { font-size:0.76rem; color:var(--ink-faint); line-height:1.55; }
+    .cov-amount {
+      display:inline-flex; align-items:center; gap:5px;
+      margin-top:7px; font-size:0.78rem; font-weight:700;
+      color:var(--p700); background:var(--p50);
+      border:1px solid var(--p200); border-radius:99px;
+      padding:3px 10px;
+    }
+
+    /* ── Premium card ── */
+    .prem-card {
+      background:#fff; border:1.5px solid var(--p300);
+      border-radius:var(--radius-sm); padding:22px 20px;
+      margin-bottom:28px;
+    }
+    .prem-row {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:8px 0; border-bottom:1px solid var(--border); font-size:0.85rem;
+    }
+    .prem-row:last-child { border-bottom:none; padding-top:14px; margin-top:6px; }
+    .prem-key { color:var(--ink-soft); }
+    .prem-val { font-weight:600; color:var(--ink); }
+    .prem-row.total .prem-key { font-weight:700; font-size:0.95rem; color:var(--ink); }
+    .prem-row.total .prem-val { font-family:var(--serif); font-size:1.5rem; font-weight:800; color:var(--p700); }
+
+    /* ── Risk bar ── */
+    .risk-bars { display:flex; flex-direction:column; gap:9px; margin-top:14px; }
+    .rbar-row  { display:flex; align-items:center; gap:10px; }
+    .rbar-label{ font-size:0.73rem; color:var(--ink-soft); width:120px; flex-shrink:0; }
+    .rbar      { flex:1; height:5px; background:var(--p100); border-radius:99px; overflow:hidden; }
+    .rbar-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--p700),var(--p400)); transition:width 0.6s ease; }
+    .rbar-pct  { font-size:0.71rem; color:var(--ink-faint); width:34px; text-align:right; }
+
+    /* ── Actions ── */
+    .action-row { display:flex; gap:10px; margin-top:4px; }
+    .action-row .btn { flex:1; }
+    .btn-outline { background:var(--p50); color:var(--p700); border:1.5px solid var(--p300); }
+    .btn-outline:hover { background:var(--p100); }
+
+    /* ── Back link ── */
+    .back-link {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:0.82rem; color:var(--p600); cursor:pointer;
+      margin-bottom:22px; background:none; border:none;
+      font-family:var(--sans); padding:0; font-weight:500;
+    }
+    .back-link:hover { text-decoration:underline; }
+
+    /* ── Empty state (no sessionStorage) ── */
+    .empty-state { text-align:center; padding:60px 20px; }
+    .empty-icon  { font-size:3rem; margin-bottom:16px; }
+    .empty-title { font-family:var(--serif); font-size:1.6rem; color:var(--ink); margin-bottom:8px; }
+    .empty-sub   { font-size:0.875rem; color:var(--ink-faint); margin-bottom:28px; line-height:1.6; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav__inner">
+    <a class="nav__logo" href="../index.html">Zepto<span>Shield</span></a>
+    <div class="nav__links">
+      <button class="nav__link" onclick="location.href='how.html'">How it works</button>
+      <button class="nav__link nav__link--active">My policy</button>
+      <button class="nav__cta" onclick="location.href='register.html'">Get protected</button>
+    </div>
+  </div>
+</nav>
+
+<main class="page">
+  <div class="policy-wrap" id="policy-wrap">
+
+    <!-- content injected by JS -->
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__logo">Zepto<span>Shield</span></div>
+      <div class="footer__copy">© 2026 ZeptoShield</div>
+    </div>
+  </footer>
+</main>
+
+<script>
+const COVERAGES = [
+  {
+    icon:"🌧️",
+    title:"Extreme Weather Disruption",
+    desc:"Triggered automatically when official storm or rain alerts are raised for 3+ hours in your city on a single day.",
+    amount:"₹1,500 per qualifying week",
+  },
+  {
+    icon:"🌡️",
+    title:"Heat-Wave Income Loss",
+    desc:"Covers earnings lost when a heat-wave advisory is active and city temperature exceeds 42 °C for 2+ consecutive days.",
+    amount:"₹750 per qualifying week",
+  },
+  {
+    icon:"🌫️",
+    title:"Hazardous AQI",
+    desc:"Activated when city AQI exceeds 300 for 48+ continuous hours, making outdoor delivery unsafe.",
+    amount:"₹500 per qualifying week",
+  },
+  {
+    icon:"🌊",
+    title:"Flood & Waterlogging",
+    desc:"Payout when flood alerts or waterlogging cover 3+ city zones, making road-based delivery impossible.",
+    amount:"₹1,000 per qualifying week",
+  },
+  {
+    icon:"🏥",
+    title:"Accident / Hospitalisation",
+    desc:"Emergency one-time payout if a delivery-related accident leads to 24+ hours of hospitalisation.",
+    amount:"Up to ₹5,000 one-time",
+  },
+];
+
+const wrap = document.getElementById("policy-wrap");
+
+/* ── Try reading sessionStorage ── */
+let data = null;
+try {
+  const raw = sessionStorage.getItem("zs_policy");
+  if (raw) data = JSON.parse(raw);
+} catch(_) {}
+
+if (!data) {
+  /* No data — show friendly empty state */
+  wrap.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">No policy loaded</div>
+      <p class="empty-sub">Please look up your account first so we can verify your identity and show your policy.</p>
+      <button class="btn btn--primary" onclick="location.href='lookup.html'">Look up my policy →</button>
+    </div>`;
+} else {
+  renderPolicy(data);
+}
+
+function renderPolicy(d) {
+  const p = d.premium;
+  const tierColor = p.tier==="High" ? "#b91c1c" : p.tier==="Medium" ? "#92400e" : "#065f46";
+  const tierBg    = p.tier==="High" ? "#fef2f2" : p.tier==="Medium" ? "#fffbeb" : "#d1fae5";
+  const joinFmt   = new Date(d.joinDate).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"});
+
+  wrap.innerHTML = `
+    <button class="back-link" onclick="location.href='lookup.html'">← Look up another number</button>
+
+    <!-- Hero card -->
+    <div class="hero-card">
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        ${d.isActive ? "Active Policy" : "Policy Inactive"}
+      </div>
+      <div class="policy-id-label">Policy ID</div>
+      <div class="policy-id-val">${d.policyId}</div>
+      <div class="holder-name">${d.name}</div>
+      <div class="holder-city">${d.city} &nbsp;·&nbsp; Delivery Partner</div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-label">Risk Zone</div>
+          <div class="stat-val">${p.tierEmoji} ${p.tier}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Member Since</div>
+          <div class="stat-val">${joinFmt}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Total Claims</div>
+          <div class="stat-val">${d.claims} claim${d.claims!==1?"s":""}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Status</div>
+          <div class="stat-val" style="color:${d.isActive?"#6ee7b7":"#fcd34d"};">${d.isActive ? "Active ✓" : "Inactive"}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coverage -->
+    <div class="sec-head">What's covered</div>
+    <div class="cov-list" id="cov-list"></div>
+
+    <!-- Premium breakdown -->
+    <div class="sec-head">Weekly premium breakdown</div>
+    <div class="prem-card">
+      <div class="prem-row"><span class="prem-key">Base premium</span><span class="prem-val">₹${p.base}</span></div>
+      <div class="prem-row"><span class="prem-key">City risk loading (${d.city})</span><span class="prem-val">₹${p.cityLoad}</span></div>
+      <div class="prem-row"><span class="prem-key">Earnings adjustment</span><span class="prem-val">₹${p.earnAdj}</span></div>
+      <div class="prem-row">
+        <span class="prem-key">Risk tier</span>
+        <span class="prem-val">
+          <span style="background:${tierBg};color:${tierColor};border-radius:99px;padding:2px 10px;font-size:0.78rem;font-weight:700;">
+            ${p.tierEmoji} ${p.tier}
+          </span>
+        </span>
+      </div>
+      <div class="prem-row total">
+        <span class="prem-key">Total weekly premium</span>
+        <span class="prem-val">₹${p.total} / week</span>
+      </div>
+
+      <!-- Risk bars -->
+      <div class="risk-bars">
+        <div class="rbar-row"><div class="rbar-label">Rainfall risk</div><div class="rbar"><div class="rbar-fill" style="width:${p.rainPct}%"></div></div><div class="rbar-pct">${p.rainPct}%</div></div>
+        <div class="rbar-row"><div class="rbar-label">Temperature risk</div><div class="rbar"><div class="rbar-fill" style="width:${p.tempPct}%"></div></div><div class="rbar-pct">${p.tempPct}%</div></div>
+        <div class="rbar-row"><div class="rbar-label">AQI risk</div><div class="rbar"><div class="rbar-fill" style="width:${p.aqiPct}%"></div></div><div class="rbar-pct">${p.aqiPct}%</div></div>
+        <div class="rbar-row"><div class="rbar-label">Flood risk</div><div class="rbar"><div class="rbar-fill" style="width:${p.floodPct}%"></div></div><div class="rbar-pct">${p.floodPct}%</div></div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-row">
+      <button class="btn btn--primary" onclick="location.href='dashboard.html?phone=${d.phone}'">Go to dashboard →</button>
+      <button class="btn btn-outline" onclick="location.href='lookup.html'">Look up another</button>
+    </div>
+  `;
+
+  /* Inject coverage items */
+  const covList = document.getElementById("cov-list");
+  COVERAGES.forEach(c => {
+    const div = document.createElement("div");
+    div.className = "cov-item";
+    div.innerHTML = `
+      <div class="cov-icon">${c.icon}</div>
+      <div class="cov-body">
+        <div class="cov-title">${c.title}</div>
+        <div class="cov-desc">${c.desc}</div>
+        <div class="cov-amount">💰 ${c.amount}</div>
+      </div>`;
+    covList.appendChild(div);
+  });
+}
+</script>
+
+</body>
+</html>
